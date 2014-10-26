@@ -47,4 +47,4 @@ $RECYCLE.BIN/
 *.lnk
 
 # Build folder and its path
-.build/
+build/
