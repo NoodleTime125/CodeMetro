@@ -8,7 +8,7 @@ public class GitInspector {
 	private static String target = ".";
 
 	//Get output from gitinspector for a git repository
-	public static void inspect(String a[]){
+	public static void inspect(){
 		try{
 		System.out.println(new File(loc).getPath());
 		System.out.println(new File(target).getCanonicalPath());
