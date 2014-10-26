@@ -14,7 +14,11 @@ public class GitInspector {
 		System.out.println(new File(target).getCanonicalPath());
 		
 		// Build process to be run
-		ProcessBuilder pb = new ProcessBuilder("python", new File(loc).getPath(), "-HTlr", new File(target).getCanonicalPath());
+		ProcessBuilder pb = new ProcessBuilder(
+				"python", 
+				new File(loc).getPath(),
+				"-HTlr",
+				new File(target).getCanonicalPath());
 		pb.environment().put("PYTHONIOENCODING", "UTF-8");
 		pb.redirectErrorStream(true);
 		Process p = pb.start();
