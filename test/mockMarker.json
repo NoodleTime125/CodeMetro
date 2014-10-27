@@ -30,6 +30,16 @@
       "properties": {
         "prop0": "Point 3"
       }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-123.143,49.31]
+      },
+      "properties": {
+        "prop0": "Point 4"
+      }
     }
   ]
 }
