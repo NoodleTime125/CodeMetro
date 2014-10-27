@@ -42,16 +42,16 @@ public class MapPlot extends PApplet{
         MapUtils.createDefaultEventDispatcher(this, metro);
 		
 		//Show particular location in world map
-		Location vancouver = new Location(49.27f,-123.1f);
+		//Location vancouver = new Location(49.27f,-123.1f);
 		Location testMap = new Location(0f,0f);
 		int zoomLv = 6; //the level of zoom for the map (0 = world view, bigger number = more zoom) use 12
 		metro.zoomAndPanTo(zoomLv, testMap);
 		
 		List<Feature> loFL = GeoJSONReader.loadData(this, JSONLineFile);
-		plotLines(loFL);
+		final MultiFeature mF = plotLines(metro, loFL); //TODO final is okay..?
 		
 		List<Feature> loF = GeoJSONReader.loadData(this, JSONMarkerFile);
-		plotPoints(loF);
+		final List<Marker> loL = plotPoints(metro, loF);
 		
 		SimplePointMarker train1 = new SimplePointMarker(new Location(0f, 1f));
 		train1.setColor(color(0,0,0));
@@ -69,86 +69,99 @@ public class MapPlot extends PApplet{
 			public void run() {
 				x = 0;
 				y = 0;
-				moveTrains(trainManager);
+				moveTrains(trainManager, mF);
 			}
 		}, 1000, 5000);
 	}
 	
-	public void plotPoints(List<Feature> loF) {
+	public MultiFeature listToMultiFeat(List<Feature> loF) { //Makes List<Feature> into MultiFeature
+		MultiFeature multiFeature = new MultiFeature();
+		for (int i = 0; i < loF.size(); i++) {
+			multiFeature.addFeature(loF.get(i));
+		}
+		return multiFeature;
+	}
+	
+	public List<Marker> plotPoints(UnfoldingMap metro, List<Feature> loF) {
 		//Plot Points
-				List<Marker> loM = MapUtils.createSimpleMarkers(loF);
-				SimplePointMarker simpleMarker;
-				for (int index = 0; index < loM.size(); index++) {
-					simpleMarker = new SimplePointMarker(loM.get(index).getLocation());
-					simpleMarker.setStrokeWeight(3);
-					simpleMarker.setStrokeColor(color(0,0,0)); //Black
-					simpleMarker.setColor(color(255,255,255)); //White
-					metro.addMarker(simpleMarker);
-					//System.out.println(loM.get(index).getLocation());
-				}
+		List<Marker> loM = MapUtils.createSimpleMarkers(loF);
+		SimplePointMarker simpleMarker;
+		for (int index = 0; index < loM.size(); index++) {
+			simpleMarker = new SimplePointMarker(loM.get(index).getLocation());
+			simpleMarker.setStrokeWeight(3);
+			simpleMarker.setStrokeColor(color(0,0,0)); //Black
+			simpleMarker.setColor(color(255,255,255)); //White
+			
+			metro.addMarker(simpleMarker);
+			//System.out.println(loM.get(index).getLocation());
+		}
+		return loM;
 	}
 	
-	public void plotLines(List<Feature> loFL) {
+	public MultiFeature plotLines(UnfoldingMap metro, List<Feature> loFL) {
 		//Plot Lines
-				List<Marker> loML = new ArrayList<Marker>();
-				
-				for (int index = 0; index < loFL.size(); index++) { //for each polyline set
-					ShapeFeature linePoint = (ShapeFeature) loFL.get(index);
-					
-					lineToSubwayLine(linePoint); //converts lines to Subway-style lines
-					
-					System.out.println("Still in for loop\n");
-					SimpleLinesMarker lineMarker = new SimpleLinesMarker(linePoint.getLocations());
-				
-					//add characteristics to lines
-					lineMarker.setStrokeWeight(5);
-					lineMarker.setColor(color(255,0,0)); //RED
-					
-					loML.add(lineMarker);
-					
-					metro.addMarker(lineMarker);
-				}
+		//List<List<Location>> loloL = new ArrayList<List<Location>>();
+		MultiFeature mF = listToMultiFeat(loFL);
+
+		for (int index = 0; index < loFL.size(); index++) { //for each polyline set
+			List<Location> loL = new ArrayList<Location>();
+			ShapeFeature line = (ShapeFeature) mF.getFeatures().get(index);
+
+			lineToSubwayLine(line); //converts lines to Subway-style lines
+
+			//System.out.println("Still in for loop\n");
+
+			//Plot lines onto map and add characteristics to lines
+			SimpleLinesMarker lineMarker = new SimpleLinesMarker(line.getLocations());
+			lineMarker.setStrokeWeight(5);
+			lineMarker.setColor(color(255,0,0)); //RED
+			
+			for (int i = 0; i < line.getLocations().size(); i++) {
+				loL.add(line.getLocations().get(i));
+			}
+			mF.addFeature(line); //each mF is exactly one line
+			metro.addMarker(lineMarker);
+		}
+		return mF;
 	}
 	
-	public void lineToSubwayLine(ShapeFeature linePoint) {
-		///* TODO REMOVES CONVERT PATH TO SUBWAY LIKE PATHS
-		//turn lines into subway-like paths
+	public void lineToSubwayLine(ShapeFeature linePoint) {	//turn lines into subway-like paths
 		int nextLocation = 1;
 		for (int i = 0; i < linePoint.getLocations().size() - nextLocation; i++){ //we compare the current latlon with next latlon, so we minus nextLocation to handle array out of bound
 			float currentLat = linePoint.getLocations().get(i).getLat();
 			float currentLon = linePoint.getLocations().get(i).getLon();
 
-			System.out.println(linePoint.getLocations().size()); //TODO remove
+			//System.out.println(linePoint.getLocations().size()); //TODO remove
 			float nextLat = linePoint.getLocations().get(i+1).getLat();
 			float nextLon = linePoint.getLocations().get(i+1).getLon();
 			if ((currentLat != nextLat)&&(currentLon != nextLon)){ //Lines will be diagonal, force lines to 45-degree angles
 				if((Math.abs(currentLat - nextLat)) != (Math.abs(currentLon - nextLon))){ //checks if lines are not 45-degrees by nature
-					System.out.println("hey, not 45 degrees!\n");
+					//System.out.println("hey, not 45 degrees!\n");
 					//float tempLatDist = Math.abs(currentLat - nextLat);
 					float tempLat;
 					float tempLon = currentLon;
 					tempLat = Math.abs(nextLon - currentLon);
 					Location tempLatLon = null;
 					
-					System.out.println("\ntempLat " + tempLat);
-					System.out.println("CLat " + currentLat + " Lon " + currentLon); //TODO remove
-					System.out.println("NLat " + nextLat + " NLon " + nextLon);
+					//System.out.println("\ntempLat " + tempLat);
+					//System.out.println("CLat " + currentLat + " Lon " + currentLon); //TODO remove
+					//System.out.println("NLat " + nextLat + " NLon " + nextLon);
 					if (Math.abs(currentLat) - Math.abs(nextLat) < Math.abs(currentLon) - Math.abs(nextLon)) { //if latitude is less than longitude
 						if (nextLon > currentLon) {
 							tempLatLon = new Location(currentLat + tempLat, tempLon); //this is fine
-							System.out.println("if else 1");
+							//System.out.println("if else 1");
 						} else {
 							tempLatLon = new Location(tempLat, tempLon - nextLon); //this is fine
-							System.out.println("if else 2");
+							//System.out.println("if else 2");
 						}
 					} else
 						if (nextLon > currentLon) {
-							System.out.println("if else 3");
+							//System.out.println("if else 3");
 							tempLatLon = new Location(nextLat, Math.abs(currentLat - nextLat));
 						}
 						else { 
 							tempLatLon = new Location(tempLat, tempLon);
-							System.out.println("if else 4");
+							//System.out.println("if else 4");
 						}
 
 					//now we insert this tempLatLon into our linePoint and recursively move all linePoints + 1
@@ -157,26 +170,21 @@ public class MapPlot extends PApplet{
 			}
 			
 		}
-		//*/ TODO REMOVES PATH TO SUBWAY PATH
 	}
 	
-	public void moveTrains(MarkerManager<Marker> trainManager) {
+	
+	public void moveTrains(MarkerManager<Marker> trainManager, MultiFeature mF) {
 		System.out.println(trainManager.getMarkers().get(0).getId());
 		System.out.println(trainManager.getMarkers().get(1).getId());
-		Ani.to(this, 6.0f, "x", 1);
-		Ani.to(this, 6.0f, "y", 3);
-	}
-	
-	public void mouseReleased() { //TODO REMOVE THIS PROOF OF CONCEPT METHOD LATER
-	    // animate the variables x and y in 1.5 sec to mouse click position
-        //System.out.println();
-		
-	    Ani.to(this, 3f, "x", 1);
-	    Ani.to(this, 3f, "y", 1);
-	    //marker needs a reference to the map plot.
-	    // So we can iterate through marker and call Ani.to inside the marker.
-	    // We also need a list of waypoints in simpleMarker. We visit each waypoint in order. Until we get to the last one.
-	    // Then, loop to initial station. But don't do animation. Just set it.
+		for (int i = 0; i < trainManager.getMarkers().size(); i++) {
+			for (int n = 0; n < mF.getFeatures().size(); n++) {
+				ShapeFeature sF = (ShapeFeature) mF.getFeatures().get(n);
+				for (int k = 0; k < sF.getLocations().size(); k++) {
+					Ani.to(this, 6.0f, "x", sF.getLocations().get(k).x);	
+					Ani.to(this, 6.0f, "y", sF.getLocations().get(k).y);
+				}
+			}
+		}
 	}
 	
 	public void draw() {
@@ -184,7 +192,7 @@ public class MapPlot extends PApplet{
 		
 		for (int i = 0; i < trainManager.getMarkers().size(); i++) {
 			if (i == 0)
-				trainManager.getMarkers().get(i).setLocation(y+1, x+1);
+				trainManager.getMarkers().get(i).setLocation(y, x);
 			else
 				trainManager.getMarkers().get(i).setLocation(y, x);
 		}

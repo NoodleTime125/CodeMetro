@@ -1,6 +1,7 @@
 package codemetro.analyzer.gitinspector;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Iterator;
 
 public class GitInspectorEntry {
@@ -27,7 +28,7 @@ public class GitInspectorEntry {
 	    Iterator it = hm.entrySet().iterator();
 	    StringBuilder buff = new StringBuilder();
 	    while (it.hasNext()) {
-	        HashMap.Entry pairs = (HashMap.Entry)it.next();
+	        Map.Entry pairs = (Map.Entry)it.next();
 	        buff.append(pairs.getKey() + " " + pairs.getValue()+ "\n");
 	    }
 	    return buff.toString();
