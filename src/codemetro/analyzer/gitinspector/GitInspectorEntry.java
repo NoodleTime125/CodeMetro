@@ -20,10 +20,10 @@ public class GitInspectorEntry {
 	
 	@Override
 	public String toString(){
-		return name + "\n" + printMap();
+		return name + "\n" + IterateHashMap();
 	}
 	
-	public String printMap() {
+	public String IterateHashMap() {
 	    Iterator it = hm.entrySet().iterator();
 	    StringBuilder buff = new StringBuilder();
 	    while (it.hasNext()) {
@@ -31,6 +31,14 @@ public class GitInspectorEntry {
 	        buff.append(pairs.getKey() + " = " + pairs.getValue()+ "\n");
 	    }
 	    return buff.toString();
+	}
+	
+	public HashMap getHashMap() {
+		return hm;
+	}
+	
+	public String getName() {
+		return name;
 	}
 
 }
