@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class CallGraphRunner {
 	
-	public static String callStrRe = "M:(.*) \\([OMSI]\\)(.*)";
+	public static String callStrRe = "^M:(.*) \\([OMSI]\\)(.*)$";
 	public ArrayList<String> output = new ArrayList<String>();
 	public void generateGraph() throws IOException {
 		String loc = "lib/java-callgraph-static.jar";
