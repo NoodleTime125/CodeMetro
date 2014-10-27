@@ -3,18 +3,23 @@ package codemetro.fuser;
 import java.util.ArrayList;
 
 public class Station {
-	public Station(int size, String name){
-		this.stationSize = size;
+	
+	private int stationSize;			// line count per class
+	private String stationName;			// n-th commit
+	private ArrayList<Train> inTrain; 	// input parameter
+	private ArrayList<Train> outTrain;	// output parameter
+	
+	public Station(String name){
 		this.stationName = name;
-		this.inTrain= new ArrayList<Train>();
+		this.inTrain = new ArrayList<Train>();
 		this.outTrain = new ArrayList<Train>();		
 	}
 	
-	public void changeSize(int size){	
+	public void setSize(int size){	
 		this.stationSize = size;
 	}
 	
-	public void changeName(String name){
+	public void setName(String name){
 		this.stationName = name;
 	}
 	
@@ -37,8 +42,5 @@ public class Station {
 		return this.stationName;
 	}
 	
-	private int stationSize;			// line count per class
-	private String stationName;			// n-th commit
-	private ArrayList<Train> inTrain; 	// input parameter
-	private ArrayList<Train> outTrain;	// output parameter
+
 }
