@@ -35,7 +35,7 @@ public class Fuser {
 		        System.out.print(me.getKey() + ": ");
 		        System.out.println(me.getValue());
 			
-			sList.add(new Station(0,name));
+			sList.add(new Station(name));
 		    }
 		}
 	}
