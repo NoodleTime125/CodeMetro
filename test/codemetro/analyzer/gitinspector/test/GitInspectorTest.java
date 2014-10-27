@@ -8,9 +8,18 @@ import codemetro.analyzer.gitinspector.GitInspector;
 
 public class GitInspectorTest {
 	
+	GitInspector git = new GitInspector();
+	
+//	@Test
+//	public void testInspect() {
+//		git.inspect();
+//	}
+	
 	@Test
-	public void test() {
-		GitInspector.inspect();
+	public void testParse() {
+		git.inspect();
+		System.out.println(git.parseOutput());
 	}
+
 
 }
