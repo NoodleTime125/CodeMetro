@@ -174,8 +174,8 @@ public class MapPlot extends PApplet{
 	
 	
 	public void moveTrains(MarkerManager<Marker> trainManager, MultiFeature mF) {
-		System.out.println(trainManager.getMarkers().get(0).getId());
-		System.out.println(trainManager.getMarkers().get(1).getId());
+		//System.out.println(trainManager.getMarkers().get(0).getId());
+		//System.out.println(trainManager.getMarkers().get(1).getId());
 		for (int i = 0; i < trainManager.getMarkers().size(); i++) {
 			for (int n = 0; n < mF.getFeatures().size(); n++) {
 				ShapeFeature sF = (ShapeFeature) mF.getFeatures().get(n);
