@@ -32,7 +32,7 @@ public class GitInspectorTest {
 	@Test
 	public void testMock() throws IOException {
 		ArrayList<String> words = new ArrayList<String>();
-		BufferedReader reader = new BufferedReader(new FileReader("C:/Users/Michael/Homework/UBC/Year 4/Term 1/Cpsc 410 101/git/CodeMetro/test/mockGitInspect.txt"));
+		BufferedReader reader = new BufferedReader(new FileReader("./test/mockGitInspect.txt"));
 		String line;
 		while ((line = reader.readLine()) != null) {
 		    words.add(line);
