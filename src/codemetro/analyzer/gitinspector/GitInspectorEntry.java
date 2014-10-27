@@ -28,7 +28,7 @@ public class GitInspectorEntry {
 	    StringBuilder buff = new StringBuilder();
 	    while (it.hasNext()) {
 	        HashMap.Entry pairs = (HashMap.Entry)it.next();
-	        buff.append(pairs.getKey() + " = " + pairs.getValue()+ "\n");
+	        buff.append(pairs.getKey() + " " + pairs.getValue()+ "\n");
 	    }
 	    return buff.toString();
 	}
