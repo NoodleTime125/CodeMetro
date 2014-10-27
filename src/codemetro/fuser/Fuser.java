@@ -50,33 +50,39 @@ public class Fuser {
 		    	}
 		    }
 		}
-		
+		createMarker(sList);
 		
 	}
 	
-	public void createMarker(String path, int nLines){
-		PrintWriter pw;
+	public void createMarker(HashMap hm){
 		try {
-			pw = new PrintWriter("Marker.json");
-			new JSONWriter(pw)
-		     .object()
+			PrintWriter pw = new PrintWriter("Marker.json");
+			JSONWriter jsonW = new JSONWriter(pw);
+		    jsonW.object()
 		         .key("type").value("FeatureCollection")
-		         	.key("features").array()
+		         	.key("features").array();
 		         		// loop
-		         		.object()
-		         			.key("type").value("Feature")
-		         			.key("geometry").object()
-		         				.key("type").value("Point")
-		         				.key("coordinates").array()
-		         					.value(-123.1).value(49.240)
-		         				.endArray()
-		         			.endObject()
-		         			.key("properties").object()
-		         				.key("path").value("nLines")
-		         			.endObject()
-		         		.endObject()
+		    			Set set = hm.entrySet(); 				// get hashmap set
+		    			Iterator i = set.iterator();			// iterator
+		    			int j = 0;
+		    			while(i.hasNext()) {					// get elements
+		    				Map.Entry me = (Map.Entry)i.next();
+			    			jsonW.object()
+			         			.key("type").value("Feature")
+			         			.key("geometry").object()
+			         				.key("type").value("Point")
+			         				.key("coordinates").array()
+			         					.value(j).value(j)		// coordinates (will implement spirial rather than diagonal)
+			         				.endArray()
+			         			.endObject()
+			         			.key("properties").object()
+			         				.key("path").value(me.getValue())
+			         			.endObject()
+			         		.endObject();
+			    			j+=0.1; 							// this is for coordinates
+		    			}
 		         		// end loop
-		         	.endArray()
+		         	jsonW.endArray()
 		     .endObject();
 			pw.close();
 		} catch (IOException e) {
