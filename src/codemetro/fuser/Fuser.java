@@ -1,21 +1,46 @@
 package codemetro.fuser;
-import java.util.*;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
+
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Writer;
-import java.text.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONException;
 import org.json.JSONWriter;
 
+import codemetro.analyzer.gitinspector.GitInspectorEntry;
+
 public class Fuser {
+	private ArrayList<GitInspectorEntry> gieList;
+	private ArrayList<Station> sList;
 	public Fuser(){
-		
+		// do nothing ; for testing purposes
 	}
 	
-	public void createLine(){
+	public Fuser(ArrayList<GitInspectorEntry> gieList){
+		this.gieList = gieList;
+		this.sList = new ArrayList<Station>();
+		
+		for(GitInspectorEntry gie : gieList){		// iterate through gie set
+			String name = gie.getName();
+			HashMap hm = gie.getHashMap();
+
+		    Set set = hm.entrySet(); 				// get hashmap set
+		    Iterator i = set.iterator();			// iterator
+		    while(i.hasNext()) {					// get elements
+		    	Map.Entry me = (Map.Entry)i.next();
+		        System.out.print(me.getKey() + ": ");
+		        System.out.println(me.getValue());
+			
+			sList.add(new Station(0,name));
+		    }
+		}
+	}
+	
+	public void createLine(String path, int nLines){
 		PrintWriter pw;
 		try {
 			pw = new PrintWriter("Line.json");
@@ -47,7 +72,7 @@ public class Fuser {
 		} 
 	}
 
-	public void createMarker(){
+	public void createMarker(String path, int nLines){
 		PrintWriter pw;
 		try {
 			pw = new PrintWriter("Marker.json");
@@ -65,7 +90,7 @@ public class Fuser {
 		         				.endArray()
 		         			.endObject()
 		         			.key("properties").object()
-		         				.key("prop0").value("Point 1")
+		         				.key("path").value("nLines")
 		         			.endObject()
 		         		.endObject()
 		         		// end loop
@@ -80,48 +105,4 @@ public class Fuser {
 			e.printStackTrace();
 		} 
 	}
-	
-	private Object in;
 }
-
-
-
-
-/*
-		obj = new JSONObject();
-		obj.put("type" , "FeatureCollection");
-		
-		JSONArray coordinates = new JSONArray();
-		coordinates.add("-123.1,49.240");
-		coordinates.add("-123.13,49.34");
-		coordinates.add("-123.13,49.34");
-		coordinates.add("-123.13,49.240");
-		
-		JSONArray coorList = new JSONArray();
-		coorList.add(coordinates);
-		
-		JSONArray featureList = new JSONArray();
-		featureList.add(new JSONObject().put("type","Feature"));
-		featureList.add(new JSONObject().put("geometry",new JSONObject().put("type","LineString")));
-		featureList.add(coorList);
-		
-		
-		obj.put("features", featureList);
-		
-		
-		//try {
-			 
-			FileWriter file = new FileWriter("Line.json");
-			file.write(obj.toJSONString());
-			file.flush();
-			file.close();
-		
-
-	 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		System.out.println(obj.toJSONString());
-		
-		
-*/
