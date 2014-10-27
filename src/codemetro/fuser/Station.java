@@ -5,12 +5,14 @@ import java.util.ArrayList;
 public class Station {
 	
 	private int stationSize;			// line count per class
-	private String stationName;			// n-th commit
+	private String stationName;			// path name  
 	private ArrayList<Train> inTrain; 	// input parameter
 	private ArrayList<Train> outTrain;	// output parameter
+	private ArrayList<String> aList;	// author list
 	
 	public Station(String name){
 		this.stationName = name;
+		this.aList = new ArrayList<String>();
 		this.inTrain = new ArrayList<Train>();
 		this.outTrain = new ArrayList<Train>();		
 	}
@@ -21,6 +23,14 @@ public class Station {
 	
 	public void setName(String name){
 		this.stationName = name;
+	}
+	
+	/*
+	 * @param name name of the author
+	 * @param nLines number of lines the author has contributed
+	 */
+	public void addAuthor(String name, int nLines){
+		this.aList.add(name +" "+ nLines);
 	}
 	
 	public void addTrainCart(String s, Object obj){
