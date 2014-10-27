@@ -22,7 +22,9 @@ public class FuserTester {
 		*/
 		
 		HashMap hm = new HashMap();
+		if(hm.isEmpty()) System.out.println("hashmap empty");
 		hm.put(new Station("some path"), "some path");
+		if(!hm.isEmpty()) System.out.println("hashmap not empty");
 		
 		if(hm.containsValue("some path")){
 			System.out.println("found");
