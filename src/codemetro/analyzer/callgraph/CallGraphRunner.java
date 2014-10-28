@@ -6,22 +6,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CallGraphRunner {
 	
-	public static String callStrRe = "^M:(.*):(.*) \\([OMSI]\\)(.*):(.*)$";
-	public ArrayList<String> output = new ArrayList<String>();
-	
+	public static String callStrRe = "^M:(.*):(.*) \\([OMSI]\\)(.*):(.*)$";	
 	
 	public Map<String, CallGraphNode> generateGraph(String target) throws IOException {
-		run(target);
-		return parseOutput();
+		List<String> output = run(target);
+		return parseOutput(output);
 	}
 	
-	public void run(String target) throws IOException {
+	protected List<String> run(String target) throws IOException {
 		String loc = "lib/java-callgraph-static.jar";
 
 		ProcessBuilder pb = new ProcessBuilder("java", "-jar", new File(loc).getPath(), new File(target).getCanonicalPath());
@@ -31,12 +30,19 @@ public class CallGraphRunner {
 		String line = null;
 		BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		
+		List<String> output = new ArrayList<String>();
 		while ((line = in.readLine()) != null) {
             output.add(line);
 		}
+		return output;
 	}
 
-	public Map<String, CallGraphNode> parseOutput() {
+	/**
+	 * Parses a textual callgraph from java-callgraph to generate an internal callgraph.
+	 * @param output
+	 * @return a callgraph
+	 */
+	protected Map<String, CallGraphNode> parseOutput(List<String> output) {
 		Map <String, CallGraphNode> nodeList = new HashMap<String, CallGraphNode>();
 		for (String line : output){
 			if(line.matches(callStrRe)){
