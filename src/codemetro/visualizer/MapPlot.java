@@ -10,13 +10,12 @@ import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.providers.*; //Map Styles
 import de.fhpotsdam.unfolding.utils.MapUtils;
 import de.fhpotsdam.unfolding.marker.*;
-
 //Ani
 import de.looksgood.ani.*;
 
 //Java Default Libraries
 import java.util.Timer;
-import java.util.TimerTask;
+//import java.util.TimerTask;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -25,13 +24,15 @@ public class MapPlot extends PApplet{
 	UnfoldingMap metro;
 	float x = 0;
 	float y = 0;
-	MarkerManager<Marker> trainManager = new MarkerManager<Marker>();
+	//MarkerManager<Marker> trainManager = new MarkerManager<Marker>();
+	List<Train> trainManager = new ArrayList<Train>();
 	
 	public void setup() {
-		size(1280, 720); //setup size of applet
+		size(1280, 720, P2D); //setup size of applet, using OpenGL's PGraphics2D as the renderer
 		smooth(); //anti-aliase edges
 		//noStroke(); //TODO disables drawing of edges?? wat		
-		Ani.init(this); //initialize Ani, our train moving visualizer...		
+		Ani.init(this); //initialize Ani, our train moving visualizer...	
+		Ani.setDefaultEasing(Ani.QUAD_IN_OUT);
 		metro = new UnfoldingMap(this, new Google.GoogleSimplifiedProvider()); //TODO using GoogleSimplified2Provider for now...find a better map style
 		String JSONLineFile = "mockLine.json";
 		String JSONMarkerFile = "mockMarker.json";
@@ -48,33 +49,56 @@ public class MapPlot extends PApplet{
 		metro.zoomAndPanTo(zoomLv, testMap);
 		
 		List<Feature> loFL = GeoJSONReader.loadData(this, JSONLineFile);
-		final MultiFeature mF = plotLines(metro, loFL); //TODO final is okay..?
+		final MultiFeature wayPoints = plotLines(metro, loFL); //plots a list of feature lines (loFL) onto Unfolding Map (metro)
 		
 		List<Feature> loF = GeoJSONReader.loadData(this, JSONMarkerFile);
-		final List<Marker> loL = plotPoints(metro, loF);
+		plotPoints(metro, loF); //plots the list of feature markers (loF) onto Unfolding Map(metro)
 		
-		SimplePointMarker train1 = new SimplePointMarker(new Location(0f, 1f));
-		train1.setColor(color(0,0,0));
-		metro.addMarker(train1);
-		trainManager.addMarker(train1);
+		//System.out.println("Way point is " + loFL.size());
 		
-		SimplePointMarker train2 = new SimplePointMarker(new Location(0f, 1f));
-		train1.setColor(color(0,0,0));
-		metro.addMarker(train2);
-		trainManager.addMarker(train2);
+		for (int i = 0; i < loFL.size(); i++) {
+			ShapeFeature sF = (ShapeFeature) loFL.get(i); //convert feature in loFL to shapefeature
+			Train train = new Train(sF.getLocations().get(0)); //initialize train at beginning of the line
+			train.getTrain().setColor(color(0,0,0));
+			trainManager.add(train); //add train to trainManager
+			train.setWayPoints(wayPoints.getFeatures().get(i)); //add waypoints of where the train needs to go (the line)
+			metro.addMarker(train.getTrain()); //add train to the map
+		}
+		
+		//Train train1 = new Train(0f, 0f);
+		//train1.getTrain().setColor(color(0,0,0));
+		//trainManager.add(train1);
+		//train1.setWayPoints(wayPoints.getFeatures().get(0));
+		//metro.addMarker(train1.getTrain());
+		
+		//Train train2 = new Train(0f, -1.0f);
+		//train2.getTrain().setColor(color(0,0,0));
+		//trainManager.add(train2);
+		//train2.setWayPoints(wayPoints.getFeatures().get(1));
+		//metro.addMarker(train2.getTrain());
 		
 		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
+		timer.schedule(new VariableTimerTask(trainManager) {
 			@Override
 			public void run() {
-				x = 0;
-				y = 0;
-				moveTrains(trainManager, mF);
+				for (int i = 0; i < trainManager.size(); i++) {
+					Train train = trainManager.get(i);
+					if (train.getIndexWayPoint() == 0) {
+						train.setX(train.getLocations().get(0).x);
+						train.setY(train.getLocations().get(0).y);
+					}
+					ShapeFeature sF = (ShapeFeature) wayPoints.getFeatures().get(train.getIndexLocation());
+					moveTrains(train, sF.getLocations().get(train.getIndexWayPoint()));
+					train.setIndexWayPoint(train.getIndexWayPoint() + 1);
+					if (train.getIndexWayPoint() >= train.getLocations().size()-1){
+						train.setIndexWayPoint(0);
+					}
+				}
 			}
-		}, 1000, 5000);
+		}, 2000, 4075);
 	}
 	
-	public MultiFeature listToMultiFeat(List<Feature> loF) { //Makes List<Feature> into MultiFeature
+	public MultiFeature listToMultiFeat(List<Feature> loF) { //Converts List<Feature> into MultiFeature
 		MultiFeature multiFeature = new MultiFeature();
 		for (int i = 0; i < loF.size(); i++) {
 			multiFeature.addFeature(loF.get(i));
@@ -93,7 +117,7 @@ public class MapPlot extends PApplet{
 			simpleMarker.setColor(color(255,255,255)); //White
 			
 			metro.addMarker(simpleMarker);
-			//System.out.println(loM.get(index).getLocation());
+			//System.out.println("LOM " + loM.get(index).getLocation());
 		}
 		return loM;
 	}
@@ -107,7 +131,7 @@ public class MapPlot extends PApplet{
 			List<Location> loL = new ArrayList<Location>();
 			ShapeFeature line = (ShapeFeature) mF.getFeatures().get(index);
 
-			lineToSubwayLine(line); //converts lines to Subway-style lines
+			//lineToSubwayLine(line); //converts lines to Subway-style lines
 
 			//System.out.println("Still in for loop\n");
 
@@ -120,6 +144,7 @@ public class MapPlot extends PApplet{
 				loL.add(line.getLocations().get(i));
 			}
 			mF.addFeature(line); //each mF is exactly one line
+			//System.out.println(line.getLocations().get(1));
 			metro.addMarker(lineMarker);
 		}
 		return mF;
@@ -172,29 +197,16 @@ public class MapPlot extends PApplet{
 		}
 	}
 	
-	
-	public void moveTrains(MarkerManager<Marker> trainManager, MultiFeature mF) {
-		//System.out.println(trainManager.getMarkers().get(0).getId());
-		//System.out.println(trainManager.getMarkers().get(1).getId());
-		for (int i = 0; i < trainManager.getMarkers().size(); i++) {
-			for (int n = 0; n < mF.getFeatures().size(); n++) {
-				ShapeFeature sF = (ShapeFeature) mF.getFeatures().get(n);
-				for (int k = 0; k < sF.getLocations().size(); k++) {
-					Ani.to(this, 6.0f, "x", sF.getLocations().get(k).x);	
-					Ani.to(this, 6.0f, "y", sF.getLocations().get(k).y);
-				}
-			}
-		}
+	public void moveTrains(Train train, Location loc) {
+		train.moveTrain(this);	
 	}
 	
 	public void draw() {
 		metro.draw(); //draw map
-		
-		for (int i = 0; i < trainManager.getMarkers().size(); i++) {
-			if (i == 0)
-				trainManager.getMarkers().get(i).setLocation(y, x);
-			else
-				trainManager.getMarkers().get(i).setLocation(y, x);
+		for (int i = 0; i < trainManager.size(); i++) {
+			Train train = trainManager.get(i);
+			train.getMarker().setLocation(train.getX(), train.getY());
+			//train.setMarker.setLocation(train.x, train.y);
 		}
 	}
 }
