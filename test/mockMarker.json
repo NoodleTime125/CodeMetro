@@ -75,10 +75,80 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [-3.0,2.0]
+        "coordinates": [-3.0,4.0]
       },
       "properties": {
         "prop0": "Point 8"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [3.0,0.0]
+      },
+      "properties": {
+        "prop0": "Point 9"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.0,1.0]
+      },
+      "properties": {
+        "prop0": "Point 10"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-5.0,0.0]
+      },
+      "properties": {
+        "prop0": "Point 11"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-7.0,2.0]
+      },
+      "properties": {
+        "prop0": "Point 12"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-7.0,-2.0]
+      },
+      "properties": {
+        "prop0": "Point 13"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.0,2.0]
+      },
+      "properties": {
+        "prop0": "Point 14"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.0,-2.0]
+      },
+      "properties": {
+        "prop0": "Point 15"
       }
     }
   ]

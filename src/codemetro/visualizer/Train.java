@@ -100,16 +100,25 @@ public class Train {
 		}
 		//System.out.println("waypoingNum is " + waypointNum);
 		//System.out.println("loc.size is " + loc.size());
-		if (waypointNum == 0) {
+		
+		if (x != loc.get(waypointNum).x && y != loc.get(waypointNum).y) { //bug fix...sometimes y or x axis isn't animated...just pop it back onto the line
+			x = loc.get(waypointNum).x;
+			y = loc.get(waypointNum).y;
+		}
+		
+		if (loc.size() == 2){ //two points in the line only
+			Ani.setDefaultEasing(Ani.QUAD_IN_OUT);
+		} else if (waypointNum == 0) { //the beginning of the line
 			Ani.setDefaultEasing(Ani.QUAD_IN);
-		} else if (waypointNum == loc.size() - 2) {
+		} else if (waypointNum == loc.size() - 2) { //the last waypoint to the final point in the line
 			Ani.setDefaultEasing(Ani.QUAD_OUT);
-		} else {
+		} else { //anything in between
 			Ani.setDefaultEasing(Ani.LINEAR);
 		}
 		waypointNum++;
 		
 		Ani.to(this, 4f, "x", loc.get(waypointNum).x);
 		Ani.to(this, 4f, "y", loc.get(waypointNum).y);
+		
 	}
 }
