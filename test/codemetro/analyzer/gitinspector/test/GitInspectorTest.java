@@ -25,8 +25,8 @@ public class GitInspectorTest {
 	
 	@Test
 	public void testParse() {
-		git.inspect();
-		System.out.println(git.parseOutput());
+		git.inspect(".");
+		git.parseOutput();
 	}
 	
 	@Test
@@ -39,7 +39,7 @@ public class GitInspectorTest {
 		}
 		reader.close();
 		git.output = words;
-		System.out.println(git.parseOutput());
+		git.parseOutput();
 	}
 
 

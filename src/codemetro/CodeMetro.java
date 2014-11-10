@@ -3,6 +3,7 @@ package codemetro;
 import java.io.IOException;
 
 import codemetro.analyzer.callgraph.CallGraphRunner;
+import codemetro.analyzer.gitinspector.GitInspector;
 
 public class CodeMetro {
 
@@ -18,6 +19,10 @@ public class CodeMetro {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		GitInspector gi = new GitInspector();
+		gi.inspect(".");
+		gi.parseOutput();
+		
 		//TODO Fuse both metrics into station/train.
 		//TODO convert into visualizer input
 		//TODO visualize

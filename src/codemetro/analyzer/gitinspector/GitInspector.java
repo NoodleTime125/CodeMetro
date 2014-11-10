@@ -8,14 +8,14 @@ import java.util.regex.Pattern;
 public class GitInspector {
 	
 	private static String loc = "lib/gitinspector-0.3.2/gitinspector/gitinspector.py";
-	private static String target = ".";
+//	private static String target = ".";
 	
 	public static String regExName = "^(.*) is mostly responsible for:$";
 	public static String regExLines = "\\s*(\\d*) (.*)\\.java$";
 	public ArrayList<String> output = new ArrayList<String>();
 
 	//Get output from gitinspector for a git repository
-	public void inspect(){
+	public void inspect(String target){
 		try{
 		System.out.println(new File(loc).getPath());
 		System.out.println(new File(target).getCanonicalPath());
@@ -69,6 +69,7 @@ public class GitInspector {
 				gie.fileEntry(x, m.group(2));
 			}
 		}
+		System.out.println(list);
 		return list;
 	}
 }
