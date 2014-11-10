@@ -6,16 +6,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GitInspector {
-	
+	// Instant fields and constants
 	private static String loc = "lib/gitinspector-0.3.2/gitinspector/gitinspector.py";
-	private static String target = ".";
+	//private static String target = ".";
 	
 	public static String regExName = "^(.*) is mostly responsible for:$";
 	public static String regExLines = "\\s*(\\d*) (.*)\\.java$";
 	public ArrayList<String> output = new ArrayList<String>();
 
-	//Get output from gitinspector for a git repository
-	public void inspect(){
+	/**
+	 * Get output from gitinspector for a git repository
+	 */
+	public void inspect(String target){
 		try{
 		System.out.println(new File(loc).getPath());
 		System.out.println(new File(target).getCanonicalPath());
@@ -46,7 +48,10 @@ public class GitInspector {
 		System.out.println("finish");
 		}catch(Exception e){System.out.println(e);}
 		}
-	
+	/**
+	 * 
+	 * @return ArrayList<GitInspectorEntry>
+	 */
 	public ArrayList<GitInspectorEntry> parseOutput() {
 		ArrayList<GitInspectorEntry> list= new ArrayList<GitInspectorEntry>();
 		GitInspectorEntry gie = null;
