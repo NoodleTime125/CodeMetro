@@ -74,6 +74,7 @@ public class GitInspector {
 				gie.fileEntry(x, m.group(2));
 			}
 		}
+		System.out.println(list);
 		return list;
 	}
 }

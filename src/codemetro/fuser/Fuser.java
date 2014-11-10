@@ -53,7 +53,10 @@ public class Fuser {
 		createMarker(sList);
 		
 	}
-	
+	/**
+	 * Creates a coordinate marker for the visualizer
+	 * @param hm a hashmap of classes
+	 */
 	public void createMarker(HashMap hm){
 		try {
 			PrintWriter pw = new PrintWriter("Marker.json");

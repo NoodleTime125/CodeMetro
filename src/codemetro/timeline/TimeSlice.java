@@ -14,7 +14,7 @@ import codemetro.analyzer.callgraph.CallGraphRunner;
  *
  */
 public class TimeSlice {
-	
+	// Instant fields and constants
 	public String commitId;
 	/** 
 	 * Target to run callgraph on.
@@ -41,6 +41,4 @@ public class TimeSlice {
 		CallGraphRunner inst = new CallGraphRunner();
 		nodes = inst.generateGraph(target);
 	}
-	
-	
 }

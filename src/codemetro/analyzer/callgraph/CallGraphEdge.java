@@ -3,7 +3,6 @@ package codemetro.analyzer.callgraph;
 /**
  * This represents a directed edge in a call graph.
  * @author Kenneth Shen
- *
  */
 public class CallGraphEdge {
 	
@@ -12,14 +11,19 @@ public class CallGraphEdge {
 	private String caller;
 	private String callee;
 	
+	/**
+	 * Constructor 
+	 * @param caller		
+	 * @param callee
+	 */
 	public CallGraphEdge (String caller, String callee){
 		this.caller = caller;
 		this.callee = callee;
 	}
 	/**
-	 * Adds this edge between two CallGraphNodes
-	 * @param from
-	 * @param to
+	 * Adds an edge between two CallGraphNodes
+	 * @param from 	a CallGraphNode
+	 * @param to	a CallGraphNode
 	 */
 	public void addEdgeBetween(CallGraphNode from, CallGraphNode to){
 		this.from = from;
@@ -30,6 +34,11 @@ public class CallGraphEdge {
 	
 	
 	@Override
+	/**
+	 * Checks if an object is a CallGraphEdge or a String
+	 * @param o 		an object to be checked
+	 * @return boolen 	true if an object is a Callgraph or String
+	 */
 	public boolean equals(Object o){
 		if (!(o instanceof CallGraphEdge)){
 			return false;

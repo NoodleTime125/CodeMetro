@@ -25,7 +25,7 @@ public class Station {
 		this.stationName = name;
 	}
 	
-	/*
+	/**
 	 * @param name name of the author
 	 * @param nLines number of lines the author has contributed
 	 */
@@ -33,6 +33,11 @@ public class Station {
 		this.aList.add(name +" "+ nLines);
 	}
 	
+	/**
+	 * adds a train to an array list of trains
+	 * @param s name of train
+	 * @param obj object
+	 */
 	public void addTrainCart(String s, Object obj){
 		if(s.equals("in"))	// inTrain
 			inTrain.add(new Train(obj));
@@ -40,14 +45,25 @@ public class Station {
 			outTrain.add(new Train(obj));
 	}
 	
+	/**
+	 * removes a train from an arraylist of trains
+	 * @param train list of trains
+	 * @param index index
+	 */
 	public void removeTrainCart(ArrayList<Train> train, int index){
 		train.remove(index);
 	}
 	
+	/**
+	 * @return int size
+	 */
 	public int getSize(){
 		return this.stationSize;
 	}
 	
+	/**
+	 * @return String name
+	 */
 	public String getName(){
 		return this.stationName;
 	}

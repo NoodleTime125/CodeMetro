@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class MapPlot extends PApplet{
+	
+	// Instant fields and constants
 	private static final long serialVersionUID = 6879860210379903374L;
 	UnfoldingMap metro;
 	float x = 0;
@@ -27,6 +29,9 @@ public class MapPlot extends PApplet{
 	//MarkerManager<Marker> trainManager = new MarkerManager<Marker>();
 	List<Train> trainManager = new ArrayList<Train>();
 	
+	/**
+	 * Setting up the visualizer
+	 */
 	public void setup() {
 		size(1280, 720, P2D); //setup size of applet, using OpenGL's PGraphics2D as the renderer
 		smooth(); //anti-aliase edges
@@ -98,6 +103,11 @@ public class MapPlot extends PApplet{
 		}, 2000, 4075);
 	}
 	
+	/**
+	 * Converts List<Features> to MultiFeature class
+	 * @param loF list of features
+	 * @return MultiFeature class
+	 */
 	public MultiFeature listToMultiFeat(List<Feature> loF) { //Converts List<Feature> into MultiFeature
 		MultiFeature multiFeature = new MultiFeature();
 		for (int i = 0; i < loF.size(); i++) {
@@ -106,6 +116,12 @@ public class MapPlot extends PApplet{
 		return multiFeature;
 	}
 	
+	/**
+	 * Plot the points with the given parameters
+	 * @param metro UnfoldingMap class
+	 * @param loF list of features
+	 * @return List<Marker> 
+	 */
 	public List<Marker> plotPoints(UnfoldingMap metro, List<Feature> loF) {
 		//Plot Points
 		List<Marker> loM = MapUtils.createSimpleMarkers(loF);
@@ -201,6 +217,10 @@ public class MapPlot extends PApplet{
 		train.moveTrain(this);	
 	}
 	
+	/**
+	 * Updates and draw the map using the draw() method of UnfoldingMap class
+	 * Puts a list of train with their respective coordinates
+	 */
 	public void draw() {
 		metro.draw(); //draw map
 		for (int i = 0; i < trainManager.size(); i++) {
