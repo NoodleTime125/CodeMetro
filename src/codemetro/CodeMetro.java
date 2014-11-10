@@ -7,6 +7,7 @@ import codemetro.analyzer.callgraph.CallGraphRunner;
 public class CodeMetro {
 
 	/**
+	 * Main method
 	 * @param args
 	 */
 	public static void main(String[] args) {
