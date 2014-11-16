@@ -1,9 +1,11 @@
 package codemetro;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import codemetro.analyzer.callgraph.CallGraphRunner;
 import codemetro.analyzer.gitinspector.GitInspector;
+import codemetro.analyzer.gitinspector.GitInspectorEntry;
 
 public class CodeMetro {
 
@@ -15,14 +17,27 @@ public class CodeMetro {
 		//TODO Call both call graph and gitinspector.
 		CallGraphRunner cg = new CallGraphRunner();
 		try {
-			cg.generateGraph("lib/core.jar");
+			cg.generateGraph("lib/codejars/CodeMetro.jar");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		GitInspector gi = new GitInspector();
-		gi.inspect(".");
-		gi.parseOutput();
+
+		try {
+			cg.generateGraph("lib/codejars/Halja.jar");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// Inspect our code and parse into an ArrayList
+		GitInspector gi1 = new GitInspector();
+		gi1.inspect(".");
+		ArrayList<GitInspectorEntry> c1 = gi1.parseOutput();
+		// Inspect other code and parse into an ArrayList
+		GitInspector gi2 = new GitInspector();
+		gi2.inspect("lib/codebase/Halja");
+		ArrayList<GitInspectorEntry> c2 = gi2.parseOutput();
 		
 		//TODO Fuse both metrics into station/train.
 		//TODO convert into visualizer input

@@ -25,7 +25,7 @@ public class GitInspectorTest {
 	
 	@Test
 	public void testParse() {
-		git.inspect(".");
+		git.inspect("lib/codebase/Halja");
 		git.parseOutput();
 	}
 	
