@@ -17,14 +17,7 @@ public class CodeMetro {
 		//TODO Call both call graph and gitinspector.
 		CallGraphRunner cg = new CallGraphRunner();
 		try {
-			cg.generateGraph("lib/codejars/CodeMetro.jar");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		try {
-			cg.generateGraph("lib/codejars/Halja.jar");
+			cg.generateGraph("lib/core.jar");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -35,9 +28,9 @@ public class CodeMetro {
 		gi1.inspect(".");
 		ArrayList<GitInspectorEntry> c1 = gi1.parseOutput();
 		// Inspect other code and parse into an ArrayList
-		GitInspector gi2 = new GitInspector();
-		gi2.inspect("lib/codebase/Halja");
-		ArrayList<GitInspectorEntry> c2 = gi2.parseOutput();
+//		GitInspector gi2 = new GitInspector();
+//		gi2.inspect("lib/codebase/Halja");
+//		ArrayList<GitInspectorEntry> c2 = gi2.parseOutput();
 		
 		//TODO Fuse both metrics into station/train.
 		//TODO convert into visualizer input
