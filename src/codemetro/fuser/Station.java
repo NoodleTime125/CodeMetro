@@ -3,9 +3,7 @@ package codemetro.fuser;
 import java.util.ArrayList;
 
 public class Station {
-	
-	private int stationSize;			// line count per class
-	private String stationName;			// path name  
+	private String stationName;			// class and path name
 	private ArrayList<Train> inTrain; 	// input parameter
 	private ArrayList<Train> outTrain;	// output parameter
 	private ArrayList<String> aList;	// author list
@@ -17,8 +15,12 @@ public class Station {
 		this.outTrain = new ArrayList<Train>();		
 	}
 	
-	public void setSize(int size){	
-		this.stationSize = size;
+	public Station(String name, String author){
+		this.stationName = name;
+		this.aList = new ArrayList<String>();
+		aList.add(author);
+		this.inTrain = new ArrayList<Train>();
+		this.outTrain = new ArrayList<Train>();		
 	}
 	
 	public void setName(String name){
@@ -52,13 +54,6 @@ public class Station {
 	 */
 	public void removeTrainCart(ArrayList<Train> train, int index){
 		train.remove(index);
-	}
-	
-	/**
-	 * @return int size
-	 */
-	public int getSize(){
-		return this.stationSize;
 	}
 	
 	/**
