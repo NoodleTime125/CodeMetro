@@ -3,6 +3,7 @@ package codemetro.analyzer.gitinspector;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
+import java.util.Map.Entry;
 
 public class GitInspectorEntry {
 	// Instant fields and constants
@@ -27,7 +28,7 @@ public class GitInspectorEntry {
 	}
 	@Override
 	/**
-	 * Iterate throught a hashmap and return
+	 * Iterate through a hashmap and return
 	 * @return String interated hashmap with name
 	 */
 	public String toString(){
@@ -37,10 +38,10 @@ public class GitInspectorEntry {
 	 * @return String a list of entries
 	 */
 	public String IterateHashMap() {
-	    Iterator it = hm.entrySet().iterator();
+	    Iterator<Entry<String, Integer>> it = hm.entrySet().iterator();
 	    StringBuilder buff = new StringBuilder();
 	    while (it.hasNext()) {
-	        Map.Entry pairs = (Map.Entry)it.next();
+	        Map.Entry<String, Integer> pairs = (Entry<String, Integer>)it.next();
 	        buff.append(pairs.getKey() + " " + pairs.getValue()+ "\n");
 	    }
 	    return buff.toString();
@@ -48,7 +49,7 @@ public class GitInspectorEntry {
 	/**
 	 * @return HashMap a list of <String, Integer>
 	 */
-	public HashMap getHashMap() {
+	public HashMap<String, Integer> getHashMap() {
 		return hm;
 	}
 	/**
