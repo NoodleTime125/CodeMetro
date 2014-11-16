@@ -80,6 +80,10 @@ public class CallGraphRunner {
 				edge.addEdgeBetween(outNode, inNode);
 				
 				System.out.println(m.group(2) + " in " + m.group(1) + " calls method " + m.group(4) + " in " + m.group(3));
+				// group(2) = caller actual class
+				// group(1) = caller path
+				// group(4) = callee actual class
+				// group(3) = callee path
 			}
 		}
 		return nodeList;
