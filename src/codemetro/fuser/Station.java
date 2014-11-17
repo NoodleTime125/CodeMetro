@@ -1,11 +1,16 @@
 package codemetro.fuser;
 
+import java.awt.Point;
 import java.util.ArrayList;
+
+import codemetro.analyzer.callgraph.CallGraphNode;
 
 public class Station {
 	private String stationName;			// class and path name
 	private ArrayList<Train> inTrain; 	// input parameter
 	private ArrayList<Train> outTrain;	// output parameter
+	private CallGraphNode cgn;			// CallGraphNode
+	private Point coordinate;
 	private ArrayList<String> aList;	// author list
 	
 	public Station(String name){
@@ -23,10 +28,21 @@ public class Station {
 		this.outTrain = new ArrayList<Train>();		
 	}
 	
+	public void setCallGraphNode(CallGraphNode cgn){
+		this.cgn = cgn;
+	}
+	public CallGraphNode getCallGraphNode(){
+		return cgn;
+	}
 	public void setName(String name){
 		this.stationName = name;
 	}
-	
+	public void setCoordinate(double x, double y){
+		this.coordinate.setLocation(x,y);
+	}
+	public Point getCoordinate(){
+		return coordinate;
+	}
 	/**
 	 * @param name name of the author
 	 * @param nLines number of lines the author has contributed

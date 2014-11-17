@@ -30,16 +30,15 @@ public class FuserTester {
 		git.output = words;
 		*/
 		GitInspector git = new GitInspector();
-		git.inspect("lib/core.jar");
-		//git.parseOutput();
-		//git.parseOutput();
-		System.out.println("git done");
+		git.inspect("./lib/core.jar");
+		//System.out.println("git done");
+		
 		// CALL GRAPH STUFF
 		CallGraphRunner instance = new CallGraphRunner();
 		//instance.generateGraph("lib/core.jar");
 		//System.out.println("call graph done");
 		
-		//Fuser f = new Fuser(git.parseOutput());
+		Fuser f = new Fuser(git.parseOutput(), instance.generateGraph("lib/core.jar"));
 		
 	}
 

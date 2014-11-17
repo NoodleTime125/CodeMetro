@@ -8,9 +8,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.lang.Math;
+
+import de.fhpotsdam.unfolding.data.Feature;
+import de.fhpotsdam.unfolding.data.Feature.FeatureType;
 
 import org.json.JSONException;
-//import org.json.JSONStringer;
 import org.json.JSONWriter;
 
 import codemetro.analyzer.callgraph.CallGraphNode;
@@ -19,6 +22,7 @@ import codemetro.analyzer.gitinspector.GitInspectorEntry;
 public class Fuser {
 	private ArrayList<GitInspectorEntry> gieList;
 	private Map<String, CallGraphNode> cgnList;
+	
 	private HashMap<String, Station> sList;
 	//private HashMap hm;
 	//private ArrayList<Station> stationList;
@@ -27,9 +31,9 @@ public class Fuser {
 		// do nothing ; for testing purposes
 	}
 	
-	public Fuser(ArrayList<GitInspectorEntry> gieList){
+	public Fuser(ArrayList<GitInspectorEntry> gieList, Map<String, CallGraphNode> cgnList){
 		this.gieList = gieList;								// list of GitInspectorEntry ... (Author,<path, #lines>)
-		this.cgnList = null;								// list of CallGraphNode ... (
+		this.cgnList = cgnList;								// list of CallGraphNode ... (
 		this.sList = new HashMap<String, Station>();		// <key, value>
 
 		
@@ -60,13 +64,53 @@ public class Fuser {
 		    	}*/
 		    }
 		}
-		System.out.println(sList);
+		//System.out.println(sList);
 	}
 	
-	private void linkStations(){ // NOT DONE
-		Map<String, CallGraphNode> results = cgnList;
+	private void linkStations(){ 		
+		Set<Map.Entry<String, CallGraphNode>> set = cgnList.entrySet(); 			// get hashmap set
+	    Iterator<Entry<String, CallGraphNode>> iterator = set.iterator();			// iterator <class and path, CallGraphNode>
+
+	    while(iterator.hasNext()) {						// get elements
+	    	Map.Entry<String, CallGraphNode> me = (Map.Entry<String, CallGraphNode>)iterator.next(); // String=key, Integer=value
+	    	if(sList.containsValue(me.getKey())){		// if the method already exists
+	    		// callgraph of station = callgraph of cgnList if found
+	    		sList.get(me.getKey()).setCallGraphNode(me.getValue());
+	    	} 
+	    }
 	}
 
+	public Feature createMap(){
+		int numOfStations = sList.size();
+		Feature f = new Feature(Feature.FeatureType.LINES);
+		int stationCounter = 0;
+		double shell; 
+		int stationInShell = 0;
+		Iterator<Entry<String, Station>> it = sList.entrySet().iterator();
+		while(it.hasNext()){ 	// iterate through the list of Stations
+			shell = Math.floor(Math.log10(stationCounter)/Math.log10(2));
+			if(stationInShell >= Math.pow(2,shell)) stationInShell = 0; //reset to 0 , new stations will be in new shells
+			Map.Entry<String, Station> pairs = (Map.Entry<String, Station>)it.next();
+			// cos = x coordinate , sin = y coordinate	
+			pairs.getValue().setCoordinate(0.1*shell+Math.cos(Math.PI*stationInShell/Math.pow(2,shell)),0.1*shell+Math.sin(Math.PI*stationInShell/Math.pow(2,shell)));
+			
+			f.addProperty(pairs.getKey(),pairs.getValue());
+			
+			stationCounter++;							// Station# = counter
+			stationInShell++;
+		}
+		return f;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	/**
 	 * Creates a coordinate marker for the visualizer
 	 * @param hm a hashmap of classes
