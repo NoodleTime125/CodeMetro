@@ -8,17 +8,17 @@
         "coordinates": [0.0,0.0]
       },
       "properties": {
-         "prop0": "Point 1"
+         "prop0": "Line 1a 45deg"
       }
     },
     {
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [0.0,2.0]
+        "coordinates": [2.0,2.0]
       },
       "properties": {
-        "prop0": "Point 2"
+         "prop0": "Lint 1b 45deg"
       }
     },
     {
@@ -28,37 +28,17 @@
         "coordinates": [1.0,0.0]
       },
       "properties": {
-        "prop0": "Point 3"
+         "prop0": "Line 2a down"
       }
     },
     {
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [-5.0,1.0]
+        "coordinates": [1.0,-2.0]
       },
       "properties": {
-        "prop0": "Point 4"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [1.0,-1.0]
-      },
-      "properties": {
-        "prop0": "Point 5"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [4.0,-1.0]
-      },
-      "properties": {
-        "prop0": "Point 6"
+         "prop0": "Line 2b down"
       }
     },
     {
@@ -68,67 +48,7 @@
         "coordinates": [-1.0,0.0]
       },
       "properties": {
-        "prop0": "Point 7"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [-3.0,4.0]
-      },
-      "properties": {
-        "prop0": "Point 8"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [3.0,0.0]
-      },
-      "properties": {
-        "prop0": "Point 9"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [7.0,1.0]
-      },
-      "properties": {
-        "prop0": "Point 10"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [-5.0,0.0]
-      },
-      "properties": {
-        "prop0": "Point 11"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [-7.0,2.0]
-      },
-      "properties": {
-        "prop0": "Point 12"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [-7.0,-2.0]
-      },
-      "properties": {
-        "prop0": "Point 13"
+         "prop0": "Line 3a 135deg"
       }
     },
     {
@@ -138,17 +58,127 @@
         "coordinates": [-3.0,2.0]
       },
       "properties": {
-        "prop0": "Point 14"
+         "prop0": "Lint 3b 135deg"
       }
     },
     {
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [-3.0,-2.0]
+        "coordinates": [-2.0,0.0]
       },
       "properties": {
-        "prop0": "Point 15"
+         "prop0": "Line 4a 315deg"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [0.0,-2.0]
+      },
+      "properties": {
+         "prop0": "Lint 4b 315deg"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-5.0,0.0]
+      },
+      "properties": {
+         "prop0": "Line 5a 225deg"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-7.0,-2.0]
+      },
+      "properties": {
+         "prop0": "Lint 5b 225deg"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.0,0.0]
+      },
+      "properties": {
+         "prop0": "Line 6a <--"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.0,0.0]
+      },
+      "properties": {
+         "prop0": "Lint 6b <--"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.0,1.0]
+      },
+      "properties": {
+         "prop0": "Lint 7a -->"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.0,1.0]
+      },
+      "properties": {
+         "prop0": "Lint 7b -->"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.0,0.0]
+      },
+      "properties": {
+         "prop0": "Lint 8a up"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.0,2.0]
+      },
+      "properties": {
+         "prop0": "Lint 8b down"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.0,-4.0]
+      },
+      "properties": {
+         "prop0": "Lint 9a 10deg"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.0,-6.0]
+      },
+      "properties": {
+         "prop0": "Lint 9b 10deg"
       }
     }
   ]

@@ -10,10 +10,12 @@ import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.Marker;
 import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 import de.looksgood.ani.Ani;
+import de.looksgood.ani.easing.Easing;
 
 public class Train {
 	float x;
 	float y;
+	Location location;
 	int indexLocation;
 	int indexWayPoint;
 	SimplePointMarker marker;
@@ -72,12 +74,22 @@ public class Train {
 		this.y = Y;
 	}
 	
+	public Location getLocation() {
+		location.set(x, y);
+		return location;
+	}
+	
 	public float getX() {
 		return x;
 	}
 	
 	public float getY() {
 		return y;
+	}
+	
+	public Location getLoc() {
+		Location loc = new Location(x, y);
+		return loc;
 	}
 	
 	public String getXStr() {
@@ -98,27 +110,26 @@ public class Train {
 			x = loc.get(waypointNum).x;
 			y = loc.get(waypointNum).y;
 		}
-		//System.out.println("waypoingNum is " + waypointNum);
-		//System.out.println("loc.size is " + loc.size());
 		
 		if (x != loc.get(waypointNum).x && y != loc.get(waypointNum).y) { //bug fix...sometimes y or x axis isn't animated...just pop it back onto the line
 			x = loc.get(waypointNum).x;
 			y = loc.get(waypointNum).y;
 		}
 		
+		Easing currentEasing;
 		if (loc.size() == 2){ //two points in the line only
-			Ani.setDefaultEasing(Ani.QUAD_IN_OUT);
+			currentEasing = Ani.SINE_IN_OUT;
 		} else if (waypointNum == 0) { //the beginning of the line
-			Ani.setDefaultEasing(Ani.QUAD_IN);
+			currentEasing = Ani.SINE_IN;
 		} else if (waypointNum == loc.size() - 2) { //the last waypoint to the final point in the line
-			Ani.setDefaultEasing(Ani.QUAD_OUT);
+			currentEasing = Ani.SINE_OUT;
 		} else { //anything in between
-			Ani.setDefaultEasing(Ani.LINEAR);
+			currentEasing = Ani.LINEAR;
 		}
 		waypointNum++;
 		
-		Ani.to(this, 4f, "x", loc.get(waypointNum).x);
-		Ani.to(this, 4f, "y", loc.get(waypointNum).y);
+		Ani.to(this, 4f, "x", loc.get(waypointNum).x, currentEasing);
+		Ani.to(this, 4f, "y", loc.get(waypointNum).y, currentEasing);
 		
 	}
 }
