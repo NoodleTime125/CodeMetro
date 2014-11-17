@@ -2,7 +2,6 @@ package codemetro.visualizer.test;
 
 import static org.junit.Assert.*;
 
-import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -14,11 +13,9 @@ import org.junit.Test;
 
 import codemetro.visualizer.MapPlot;
 import de.fhpotsdam.unfolding.data.Feature;
-import de.fhpotsdam.unfolding.data.Feature.FeatureType;
 import de.fhpotsdam.unfolding.data.GeoJSONReader;
 import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.Marker;
-import de.fhpotsdam.unfolding.marker.SimpleLinesMarker;
 import de.fhpotsdam.unfolding.providers.Google;
 
 public class MapPlotTest {

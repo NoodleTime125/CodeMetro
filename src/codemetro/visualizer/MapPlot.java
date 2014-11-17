@@ -27,7 +27,7 @@ public class MapPlot extends PApplet{
 	float x = 0;
 	float y = 0;
 	List<Train> trainManager = new ArrayList<Train>();
-	List<Feature>  allLoFL;
+	List<Feature>  allLoFL = new ArrayList<Feature>(); //contains all the Features in a List
 	Random rand = new Random(100);
 	int year = 1980;
 	int yearcounter = 0;
@@ -40,33 +40,18 @@ public class MapPlot extends PApplet{
 	public void setup() {
 		size(1280, 720, P2D); //setup size of applet, using OpenGL's PGraphics2D as the renderer
 		smooth(); //anti-aliase edges
-		//noStroke(); //TODO disables drawing of edges?? wat		
+		noStroke();	
 		Ani.init(this); //initialize Ani, our train moving visualizer...	
 		Ani.setDefaultEasing(Ani.QUAD_IN_OUT);
 		metro = new UnfoldingMap(this, new Google.GoogleSimplifiedProvider()); //TODO using GoogleSimplified2Provider for now...find a better map style
 		
-		String JSONLineFile = "mockLine.json";
-		allLoFL = GeoJSONReader.loadData(this, JSONLineFile);
-		for (int i = 0; i < allLoFL.size(); i++) {
-			System.out.println(allLoFL.get(i).getProperties());
-		}
-		
-		Feature f = new Feature(Feature.FeatureType.LINES);
-		ShapeFeature shapef = new ShapeFeature(Feature.FeatureType.LINES);
-		shapef.addLocation(new Location(0.0,0.0));
-		shapef.addLocation(new Location(10.0,10.0));
-		f.addProperty(null, null);
-		//allLoFL.add(f);
-		
-		
-		//String JSONMarkerFile = "mockMarker.json";
+		testmethod();
 		
 		// Add mouse and keyboard interactions 
 		//TODO Remove in the future, we don't want users to fiddle with the map.
         MapUtils.createDefaultEventDispatcher(this, metro);
 		
 		//Show particular location in world map
-		//Location vancouver = new Location(49.27f,-123.1f);
 		Location testMap = new Location(0f,0f);
 		int zoomLv = 6; //the level of zoom for the map (0 = world view, bigger number = more zoom) use 12
 		metro.zoomAndPanTo(zoomLv, testMap);
@@ -93,7 +78,16 @@ public class MapPlot extends PApplet{
 		run(loFL, wayPoints);
 	}
 	
-	public void linetoStation(List<Feature> loFL) { //gets the stations from a line
+	private void testmethod() { //TODO remove later when Angelo's stuff works with MapPlot
+		List<Feature> test; //TODO remove later when Angelo's stuff works
+		String JSONLineFile = "mockLine.json"; //TODO remove later when Angelo's stuff works
+		test = GeoJSONReader.loadData(this, JSONLineFile); //TODO remove later when Angelo's stuff works
+		for(int i = 0; i < test.size(); i++) {
+			addLine(test.get(i));
+		}
+	}
+
+	private void linetoStation(List<Feature> loFL) { //gets the stations from a line
 
 		for (int i = 0; i < loFL.size() ; i++) {
 			ShapeFeature wP = (ShapeFeature) loFL.get(i);
@@ -105,7 +99,7 @@ public class MapPlot extends PApplet{
 		}
 	}
 	
-	public MultiFeature addTrain(List<Feature> loFL) {
+	private MultiFeature addTrain(List<Feature> loFL) {
 		MultiFeature wayPoints = plotLines(metro, loFL); //plots a list of feature lines (loFL) onto Unfolding Map (metro)
 
 		//plotPoints(metro, loF); //plots the list of feature markers (loF) onto Unfolding Map(metro)
@@ -121,7 +115,7 @@ public class MapPlot extends PApplet{
 		return wayPoints;
 	}
 	
-	public void run(List<Feature> allLoFL, final MultiFeature wayPoints) {	
+	private void run(List<Feature> allLoFL, final MultiFeature wayPoints) {	
 		Timer timer = new Timer();
 		timer.schedule(new VariableTimerTask(trainManager) {
 			@Override
@@ -150,9 +144,7 @@ public class MapPlot extends PApplet{
 		}, 2000, 4050);
 	}
 	
-	public void addLine(Feature feat) {
-		//TODO angelo calls this to me and i will plot the line onto the map
-		//allLoFL.
+	private void addLine(Feature feat) {
 		allLoFL.add(feat);
 	}
 	
@@ -161,7 +153,7 @@ public class MapPlot extends PApplet{
 	 * @param loF list of features
 	 * @return MultiFeature class
 	 */
-	public MultiFeature listToMultiFeat(List<Feature> loF) { //Converts List<Feature> into MultiFeature
+	private MultiFeature listToMultiFeat(List<Feature> loF) { //Converts List<Feature> into MultiFeature
 		MultiFeature multiFeature = new MultiFeature();
 		for (int i = 0; i < loF.size(); i++) {
 			multiFeature.addFeature(loF.get(i));
@@ -197,7 +189,7 @@ public class MapPlot extends PApplet{
 	 * @param feat a feature
 	 * @return void 
 	 */
-	public void plotPoint(UnfoldingMap metro, Location loc) {
+	private void plotPoint(UnfoldingMap metro, Location loc) {
 		//Plot Points
 		SimplePointMarker simpleMarker;
 		simpleMarker = new SimplePointMarker(loc);
@@ -214,7 +206,6 @@ public class MapPlot extends PApplet{
 		MultiFeature mF = listToMultiFeat(loFL);
 
 		for (int index = 0; index < loFL.size(); index++) { //for each polyline set
-			List<Location> loL = new ArrayList<Location>();
 			ShapeFeature line = (ShapeFeature) mF.getFeatures().get(index);
 			line = lineToSubwayLine(line); //converts lines to Subway-style lines
 			
@@ -222,12 +213,8 @@ public class MapPlot extends PApplet{
 			SimpleLinesMarker lineMarker = new SimpleLinesMarker(line.getLocations());
 			lineMarker.setStrokeWeight(5);
 			lineMarker.setColor(color(rand.nextInt(255),rand.nextInt(255),rand.nextInt(255))); //just some random color
-			
-			//for (int i = 0; i < line.getLocations().size(); i++) {
-			//	loL.add(line.getLocations().get(i));
-			//}
+
 			mF.addFeature(line); //each mF is exactly one line
-			//System.out.println(line.getLocations().get(1));
 			metro.addMarker(lineMarker);
 		}
 		return mF;
@@ -243,21 +230,13 @@ public class MapPlot extends PApplet{
 
 			if ((currentLat != nextLat)&&(currentLon != nextLon)){ //checks if current and next are not the same point
 				float riserun;
-				//System.out.println();
 				if (currentLon < nextLon) {
 					riserun = ((Math.abs(nextLat - currentLat)) / (Math.abs(nextLon - currentLon)));
-					//System.out.println("currentLon < nextLon");
 				} else {
-					//System.out.println("currentLon > nextLon");
 					riserun = ((Math.abs(currentLat - nextLat)) / (Math.abs(currentLon - nextLon)));
 				}
-				//float epsilon = 0.001f; //for float comparison
-				//System.out.println(riserun + " riserun");
 				if (riserun != 1) {
-					//System.out.println(currentLon + ", " + currentLat + "    " + nextLon + ", " + nextLat);
-					//System.out.println("not 45 degrees!" + riserun);
 					if (riserun > 1) { //45degrees to 90degrees exclusive
-						//System.out.println("45-90!");
 						float tempLon = nextLon;
 						float tempLat;
 						if (currentLon < nextLon) {
@@ -275,7 +254,6 @@ public class MapPlot extends PApplet{
 						}
 						linePoint.getLocations().add(i+1, new Location(tempLat, tempLon));
 					} else {//0degrees to 45degrees exclusive
-						//System.out.println("0-45!");
 						float tempLon;
 						float tempLat = nextLat;
 						if (currentLon < nextLon) {
@@ -294,18 +272,11 @@ public class MapPlot extends PApplet{
 						linePoint.getLocations().add(i+1, new Location(tempLat, tempLon));
 					}
 				} else { //a base case
-					//System.out.println(currentLon + ", " + currentLat + "    " + nextLon + ", " + nextLat);
-					//System.out.println("These two points are 45 degrees already!");
 				}
 			} else { //a base case
 				if ((currentLat != nextLat)&&(currentLon == nextLon)) { //a vertical line
-					//System.out.println(currentLon + ", " + currentLat + "    " + nextLon + ", " + nextLat);
-					//System.out.println("These two points are verticle!");
 				} else if ((currentLat == nextLat) && (currentLon != nextLon)) { //a horizontal line
-					//System.out.println(currentLon + ", " + currentLat + "    " + nextLon + ", " + nextLat);
-					//System.out.println("These two points are horizontal!");
 				} else {
-					//System.out.println("These two points are the same point!");
 				}
 			}
 			
@@ -313,7 +284,7 @@ public class MapPlot extends PApplet{
 		return linePoint;
 	}
 	
-	public void moveTrains(Train train, Location loc) {
+	private void moveTrains(Train train, Location loc) {
 		train.moveTrain(this);	
 	}
 	
