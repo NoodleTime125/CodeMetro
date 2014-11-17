@@ -10,7 +10,6 @@ import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.providers.*; //Map Styles
 import de.fhpotsdam.unfolding.utils.MapUtils;
 import de.fhpotsdam.unfolding.marker.*;
-
 //Ani
 import de.looksgood.ani.*;
 
@@ -18,6 +17,8 @@ import de.looksgood.ani.*;
 import java.util.Timer;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.TimerTask;
+import java.util.Random;
 
 public class MapPlot extends PApplet{
 	
@@ -27,6 +28,9 @@ public class MapPlot extends PApplet{
 	float x = 0;
 	float y = 0;
 	List<Train> trainManager = new ArrayList<Train>();
+	List<Feature>  allLoFL;
+	Random rand = new Random(100);
+	
 	
 	/**
 	 * Setting up the visualizer
@@ -39,7 +43,7 @@ public class MapPlot extends PApplet{
 		Ani.setDefaultEasing(Ani.QUAD_IN_OUT);
 		metro = new UnfoldingMap(this, new Google.GoogleSimplifiedProvider()); //TODO using GoogleSimplified2Provider for now...find a better map style
 		String JSONLineFile = "mockLine.json";
-		String JSONMarkerFile = "mockMarker.json";
+		//String JSONMarkerFile = "mockMarker.json";
 		
 		
 		// Add mouse and keyboard interactions 
@@ -52,12 +56,31 @@ public class MapPlot extends PApplet{
 		int zoomLv = 6; //the level of zoom for the map (0 = world view, bigger number = more zoom) use 12
 		metro.zoomAndPanTo(zoomLv, testMap);
 		
-		List<Feature> loFL = GeoJSONReader.loadData(this, JSONLineFile);
+		allLoFL = GeoJSONReader.loadData(this, JSONLineFile);
+		/*
+		Timer featureTimer = new Timer();
+		featureTimer.schedule(new FeatureTimerTask(allLoFL) {
+			@Override
+			public void run() {
+				
+			}
+		}, 2000, 4075);
+		*/
+		ShapeFeature hm = (ShapeFeature) allLoFL.get(0);
+		System.out.println(hm.getLocations().get(0));
+		System.out.println(hm.getLocations().get(1));
+		List<Feature> loFL = allLoFL;
+
+		for (int i = 0; i < allLoFL.size() ; i++) {
+			ShapeFeature wP = (ShapeFeature) allLoFL.get(i);
+			for (int j = 0; j < wP.getLocations().size() ; j++) {
+					plotPoint(metro, wP.getLocations().get(j));
+			}
+		}
+		
 		final MultiFeature wayPoints = plotLines(metro, loFL); //plots a list of feature lines (loFL) onto Unfolding Map (metro)
-		
-		List<Feature> loF = GeoJSONReader.loadData(this, JSONMarkerFile);
-		plotPoints(metro, loF); //plots the list of feature markers (loF) onto Unfolding Map(metro)
-		
+
+		//plotPoints(metro, loF); //plots the list of feature markers (loF) onto Unfolding Map(metro)
 		for (int i = 0; i < loFL.size(); i++) {
 			ShapeFeature sF = (ShapeFeature) wayPoints.getFeatures().get(i); //convert feature in wayPoints to shapefeature
 			Train train = new Train(sF.getLocations().get(0)); //initialize train at beginning of the line
@@ -86,7 +109,12 @@ public class MapPlot extends PApplet{
 					}
 				}
 			}
-		}, 2000, 4075);
+		}, 2000, 4050);
+	}
+	
+	public void addLine(Feature feat) {
+		//TODO angelo calls this to me and i will plot the line onto the map
+		//allLoFL.
 	}
 	
 	/**
@@ -124,6 +152,23 @@ public class MapPlot extends PApplet{
 		return loM;
 	}
 	
+	/**
+	 * Plot the point with the given parameters
+	 * @param metro UnfoldingMap class
+	 * @param feat a feature
+	 * @return void 
+	 */
+	public void plotPoint(UnfoldingMap metro, Location loc) {
+		//Plot Points
+		SimplePointMarker simpleMarker;
+		simpleMarker = new SimplePointMarker(loc);
+		simpleMarker.setStrokeWeight(3);
+		simpleMarker.setStrokeColor(color(0,0,0)); //Black
+		simpleMarker.setColor(color(255,255,255)); //White
+
+		metro.addMarker(simpleMarker);
+	}
+	
 	public MultiFeature plotLines(UnfoldingMap metro, List<Feature> loFL) {
 		//Plot Lines
 		//List<List<Location>> loloL = new ArrayList<List<Location>>();
@@ -132,16 +177,12 @@ public class MapPlot extends PApplet{
 		for (int index = 0; index < loFL.size(); index++) { //for each polyline set
 			List<Location> loL = new ArrayList<Location>();
 			ShapeFeature line = (ShapeFeature) mF.getFeatures().get(index);
-			System.out.println("line : " + line.getLocations().size());
-
 			line = lineToSubwayLine(line); //converts lines to Subway-style lines
-			System.out.println("line : " + line.getLocations().size());
-			//System.out.println("Still in for loop\n");
-
+			
 			//Plot lines onto map and add characteristics to lines
 			SimpleLinesMarker lineMarker = new SimpleLinesMarker(line.getLocations());
 			lineMarker.setStrokeWeight(5);
-			lineMarker.setColor(color(255,0,0)); //RED
+			lineMarker.setColor(color(rand.nextInt(255),rand.nextInt(255),rand.nextInt(255))); //just some random color
 			
 			for (int i = 0; i < line.getLocations().size(); i++) {
 				loL.add(line.getLocations().get(i));
