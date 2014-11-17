@@ -29,7 +29,8 @@ public class MapPlot extends PApplet{
 	List<Train> trainManager = new ArrayList<Train>();
 	List<Feature>  allLoFL;
 	Random rand = new Random(100);
-	int year = 0;
+	int year = 1980;
+	int yearcounter = 0;
 	String yearStr = Integer.toString(year);
 	String name = "Testing";
 	
@@ -43,7 +44,21 @@ public class MapPlot extends PApplet{
 		Ani.init(this); //initialize Ani, our train moving visualizer...	
 		Ani.setDefaultEasing(Ani.QUAD_IN_OUT);
 		metro = new UnfoldingMap(this, new Google.GoogleSimplifiedProvider()); //TODO using GoogleSimplified2Provider for now...find a better map style
+		
 		String JSONLineFile = "mockLine.json";
+		allLoFL = GeoJSONReader.loadData(this, JSONLineFile);
+		for (int i = 0; i < allLoFL.size(); i++) {
+			System.out.println(allLoFL.get(i).getProperties());
+		}
+		
+		Feature f = new Feature(Feature.FeatureType.LINES);
+		ShapeFeature shapef = new ShapeFeature(Feature.FeatureType.LINES);
+		shapef.addLocation(new Location(0.0,0.0));
+		shapef.addLocation(new Location(10.0,10.0));
+		f.addProperty(null, null);
+		//allLoFL.add(f);
+		
+		
 		//String JSONMarkerFile = "mockMarker.json";
 		
 		// Add mouse and keyboard interactions 
@@ -56,7 +71,7 @@ public class MapPlot extends PApplet{
 		int zoomLv = 6; //the level of zoom for the map (0 = world view, bigger number = more zoom) use 12
 		metro.zoomAndPanTo(zoomLv, testMap);
 		
-		allLoFL = GeoJSONReader.loadData(this, JSONLineFile);
+
 		
 		Timer featureTimer = new Timer();
 		featureTimer.schedule(new FeatureTimerTask(allLoFL) {
@@ -66,8 +81,15 @@ public class MapPlot extends PApplet{
 			}
 		}, 2000, 4075);
 		List<Feature> loFL = allLoFL;
-		linetoStation(loFL);
+		List<Feature> loF = new ArrayList<Feature>();
+		for (int i = 0; i < loFL.size(); i++) {
+			loF.add(loFL.get(i));
+		}
+
+		System.out.println("\n");
 		MultiFeature wayPoints = addTrain(loFL);
+		linetoStation(loF);
+		
 		run(loFL, wayPoints);
 	}
 	
@@ -76,7 +98,9 @@ public class MapPlot extends PApplet{
 		for (int i = 0; i < loFL.size() ; i++) {
 			ShapeFeature wP = (ShapeFeature) loFL.get(i);
 			for (int j = 0; j < wP.getLocations().size() ; j++) {
+				if (j == 0 || j == wP.getLocations().size() -1) {
 					plotPoint(metro, wP.getLocations().get(j));
+				}
 			}
 		}
 	}
@@ -116,7 +140,11 @@ public class MapPlot extends PApplet{
 						train.setIndexWayPoint(0);
 					}
 				}
-				year++;
+				yearcounter++;
+				if (yearcounter == 4) {
+					year++;
+					yearcounter = 0;
+				}
 				yearStr = Integer.toString(year);
 			}
 		}, 2000, 4050);
@@ -125,6 +153,7 @@ public class MapPlot extends PApplet{
 	public void addLine(Feature feat) {
 		//TODO angelo calls this to me and i will plot the line onto the map
 		//allLoFL.
+		allLoFL.add(feat);
 	}
 	
 	/**
@@ -194,9 +223,9 @@ public class MapPlot extends PApplet{
 			lineMarker.setStrokeWeight(5);
 			lineMarker.setColor(color(rand.nextInt(255),rand.nextInt(255),rand.nextInt(255))); //just some random color
 			
-			for (int i = 0; i < line.getLocations().size(); i++) {
-				loL.add(line.getLocations().get(i));
-			}
+			//for (int i = 0; i < line.getLocations().size(); i++) {
+			//	loL.add(line.getLocations().get(i));
+			//}
 			mF.addFeature(line); //each mF is exactly one line
 			//System.out.println(line.getLocations().get(1));
 			metro.addMarker(lineMarker);
@@ -294,10 +323,15 @@ public class MapPlot extends PApplet{
 	 */
 	public void draw() {
 		metro.draw(); //draw map
-		
+		/*
+		textSize(35);
+		fill(color(255,255,255));
+		text("City name: " + name, 10, 40);
+		text("Year: " + year, 1100, 40);
+		*/ //TODO add a background for text files
 		textSize(30);
 		fill(color(0,0,0));
-		text("City name: " + name, 10, 40);	
+		text("City name: " + name, 10, 40);
 		text("Year: " + year, 1100, 40);
 		
 		for (int i = 0; i < trainManager.size(); i++) {
