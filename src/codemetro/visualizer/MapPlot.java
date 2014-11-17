@@ -17,7 +17,6 @@ import de.looksgood.ani.*;
 import java.util.Timer;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.TimerTask;
 import java.util.Random;
 
 public class MapPlot extends PApplet{
@@ -30,7 +29,9 @@ public class MapPlot extends PApplet{
 	List<Train> trainManager = new ArrayList<Train>();
 	List<Feature>  allLoFL;
 	Random rand = new Random(100);
-	
+	int year = 0;
+	String yearStr = Integer.toString(year);
+	String name = "Testing";
 	
 	/**
 	 * Setting up the visualizer
@@ -45,7 +46,6 @@ public class MapPlot extends PApplet{
 		String JSONLineFile = "mockLine.json";
 		//String JSONMarkerFile = "mockMarker.json";
 		
-		
 		// Add mouse and keyboard interactions 
 		//TODO Remove in the future, we don't want users to fiddle with the map.
         MapUtils.createDefaultEventDispatcher(this, metro);
@@ -57,28 +57,32 @@ public class MapPlot extends PApplet{
 		metro.zoomAndPanTo(zoomLv, testMap);
 		
 		allLoFL = GeoJSONReader.loadData(this, JSONLineFile);
-		/*
+		
 		Timer featureTimer = new Timer();
 		featureTimer.schedule(new FeatureTimerTask(allLoFL) {
 			@Override
 			public void run() {
-				
+				//run(allLoFL);
 			}
 		}, 2000, 4075);
-		*/
-		ShapeFeature hm = (ShapeFeature) allLoFL.get(0);
-		System.out.println(hm.getLocations().get(0));
-		System.out.println(hm.getLocations().get(1));
 		List<Feature> loFL = allLoFL;
+		linetoStation(loFL);
+		MultiFeature wayPoints = addTrain(loFL);
+		run(loFL, wayPoints);
+	}
+	
+	public void linetoStation(List<Feature> loFL) { //gets the stations from a line
 
-		for (int i = 0; i < allLoFL.size() ; i++) {
-			ShapeFeature wP = (ShapeFeature) allLoFL.get(i);
+		for (int i = 0; i < loFL.size() ; i++) {
+			ShapeFeature wP = (ShapeFeature) loFL.get(i);
 			for (int j = 0; j < wP.getLocations().size() ; j++) {
 					plotPoint(metro, wP.getLocations().get(j));
 			}
 		}
-		
-		final MultiFeature wayPoints = plotLines(metro, loFL); //plots a list of feature lines (loFL) onto Unfolding Map (metro)
+	}
+	
+	public MultiFeature addTrain(List<Feature> loFL) {
+		MultiFeature wayPoints = plotLines(metro, loFL); //plots a list of feature lines (loFL) onto Unfolding Map (metro)
 
 		//plotPoints(metro, loF); //plots the list of feature markers (loF) onto Unfolding Map(metro)
 		for (int i = 0; i < loFL.size(); i++) {
@@ -90,6 +94,10 @@ public class MapPlot extends PApplet{
 			metro.addMarker(train.getTrain()); //add train to the map
 		}
 		
+		return wayPoints;
+	}
+	
+	public void run(List<Feature> allLoFL, final MultiFeature wayPoints) {	
 		Timer timer = new Timer();
 		timer.schedule(new VariableTimerTask(trainManager) {
 			@Override
@@ -108,6 +116,8 @@ public class MapPlot extends PApplet{
 						train.setIndexWayPoint(0);
 					}
 				}
+				year++;
+				yearStr = Integer.toString(year);
 			}
 		}, 2000, 4050);
 	}
@@ -284,6 +294,12 @@ public class MapPlot extends PApplet{
 	 */
 	public void draw() {
 		metro.draw(); //draw map
+		
+		textSize(30);
+		fill(color(0,0,0));
+		text("City name: " + name, 10, 40);	
+		text("Year: " + year, 1100, 40);
+		
 		for (int i = 0; i < trainManager.size(); i++) {
 			Train train = trainManager.get(i);
 			train.getMarker().setLocation(train.getLoc());
