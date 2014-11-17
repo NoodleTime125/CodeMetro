@@ -81,7 +81,6 @@ public class Fuser {
 	}
 
 	public Feature createMap(){
-		int numOfStations = sList.size();
 		Feature f = new Feature(Feature.FeatureType.LINES);
 		int stationCounter = 0;
 		double shell; 
@@ -92,7 +91,7 @@ public class Fuser {
 			if(stationInShell >= Math.pow(2,shell)) stationInShell = 0; //reset to 0 , new stations will be in new shells
 			Map.Entry<String, Station> pairs = (Map.Entry<String, Station>)it.next();
 			// cos = x coordinate , sin = y coordinate	
-			pairs.getValue().setCoordinate(0.1*shell+Math.cos(Math.PI*stationInShell/Math.pow(2,shell)),0.1*shell+Math.sin(Math.PI*stationInShell/Math.pow(2,shell)));
+			pairs.getValue().setCoordinate(0.1*shell*Math.cos(Math.PI*stationInShell/Math.pow(2,shell)),0.1*shell*Math.sin(Math.PI*stationInShell/Math.pow(2,shell)));
 			
 			f.addProperty(pairs.getKey(),pairs.getValue());
 			
