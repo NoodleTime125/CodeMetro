@@ -1,46 +1,47 @@
 package codemetro.fuser;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
+import static org.junit.Assert.*;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+import org.junit.Test;
+
+import codemetro.analyzer.callgraph.CallGraphRunner;
+import codemetro.analyzer.gitinspector.GitInspector;
 import codemetro.fuser.Fuser;
 
 public class FuserTester {
-	public static void main(String args[]){
-		//Fuser f = new Fuser();
-		
-		/*
-		ArrayList<Station> sList = new ArrayList<Station>();
-		sList.add(new Station("testing"));
-		
-		if(sList.contains(new Station("testing"))){
-			System.out.println("found");
-		} else
-			System.out.println("not found");
+	@Test
+	public void testMock() throws IOException {
+		// GIT INSPECTOR STUFF
+		/*ArrayList<String> words = new ArrayList<String>();
+		BufferedReader reader = new BufferedReader(new FileReader("./test/mockGitInspect.txt"));
+		String line;
+		while ((line = reader.readLine()) != null) {
+		    words.add(line);
+		}
+		reader.close();
+		git.output = words;
 		*/
+		GitInspector git = new GitInspector();
+		git.inspect("lib/core.jar");
+		//git.parseOutput();
+		//git.parseOutput();
+		System.out.println("git done");
+		// CALL GRAPH STUFF
+		CallGraphRunner instance = new CallGraphRunner();
+		//instance.generateGraph("lib/core.jar");
+		//System.out.println("call graph done");
 		
-		HashMap hm = new HashMap();
-		if(hm.isEmpty()) System.out.println("hashmap empty");
-		hm.put(new Station("some path"), "some path");
-		if(!hm.isEmpty()) System.out.println("hashmap not empty");
+		//Fuser f = new Fuser(git.parseOutput());
 		
-		if(hm.containsValue("some path")){
-			System.out.println("found");
-		} else
-			System.out.println("not found");
-		/*
-		 // Get a set of the entries
-	      Set set = hm.entrySet();
-	      // Get an iterator
-	      Iterator i = set.iterator();
-	      // Display elements
-	      while(i.hasNext()) {
-	         Map.Entry me = (Map.Entry)i.next();
-	         System.out.print(((Station) me.getKey()).getName() + ": ");
-	         System.out.println(me.getValue());
-	      }
-	      */
 	}
+
+
 }

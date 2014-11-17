@@ -13,18 +13,19 @@ import junit.framework.TestCase;
 
 public class CallGraphRunnerTest extends TestCase{
 
-	private CallGraphRunner instance = new CallGraphRunner();
+	private CallGraphRunner instance = new CallGraphRunner();	// CallGraphRunner class
 	
 	@Test
 	public void test() throws IOException{
 		instance.generateGraph("lib/core.jar");
 	}
 	
-	@Test
+
 	/**
 	 * Tests the parsing function for parseOutput.
 	 * @throws IOException
 	 */
+	/*@Test
 	public void testParse() throws IOException{
 		String fileName = "test/codemetro/analyzer/callgraph/mockCallGraphOutput.txt";
 		List<String> output = new ArrayList<String>();
@@ -36,6 +37,7 @@ public class CallGraphRunnerTest extends TestCase{
 		in.close();
 		System.out.println("myInstance" + instance);
 		Map<String, CallGraphNode> results = instance.parseOutput(output);
+		//System.out.println(results);
 		assertEquals(14, results.size());
-	}
+	}*/
 }

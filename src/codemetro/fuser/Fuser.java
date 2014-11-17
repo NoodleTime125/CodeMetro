@@ -6,55 +6,72 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.json.JSONException;
-import org.json.JSONStringer;
+//import org.json.JSONStringer;
 import org.json.JSONWriter;
 
+import codemetro.analyzer.callgraph.CallGraphNode;
 import codemetro.analyzer.gitinspector.GitInspectorEntry;
 
 public class Fuser {
 	private ArrayList<GitInspectorEntry> gieList;
-	private HashMap sList;
-	//private ArrayList<Station> sList;
+	private Map<String, CallGraphNode> cgnList;
+	private HashMap<String, Station> sList;
+	//private HashMap hm;
+	//private ArrayList<Station> stationList;
 	
 	public Fuser(){
 		// do nothing ; for testing purposes
 	}
 	
 	public Fuser(ArrayList<GitInspectorEntry> gieList){
-		this.gieList = gieList;
-		//this.sList = new ArrayList<Station>();
-		this.sList = new HashMap();
-		
-		for(GitInspectorEntry gie : gieList){		// iterate through gie set
-			String name = gie.getName();
-			HashMap hm = gie.getHashMap();
+		this.gieList = gieList;								// list of GitInspectorEntry ... (Author,<path, #lines>)
+		this.cgnList = null;								// list of CallGraphNode ... (
+		this.sList = new HashMap<String, Station>();		// <key, value>
 
-		    Set set = hm.entrySet(); 				// get hashmap set
-		    Iterator i = set.iterator();			// iterator
-		    while(i.hasNext()) {					// get elements
-		    	Map.Entry me = (Map.Entry)i.next();
-		        //System.out.print(me.getKey() + ": ");
-		        //System.out.println(me.getValue());
-			
-			    if(!sList.isEmpty()){ //check if empty
-			    	if(sList.containsValue(me.getValue()+"")){
-			    		// TO DO
-			    		// do not duplicate if already in the list
-			    	} else {
-			    		// put Station and class path in the list
-			    		sList.put(new Station(me.getKey()+""),me.getKey()+""); 
-			    	}
-		    	}
-		    }
-		}
-		createMarker(sList);
 		
+		stationsMaker();	// GitInspector
+		linkStations();		// CallGraph
 	}
 	
-	public void createMarker(HashMap hm){
+	private void stationsMaker(){
+		for(GitInspectorEntry gie : gieList){				// iterate through gie set
+			String authorName = gie.getName();				// author's name
+			HashMap<String, Integer> hm = gie.getHashMap();	// class and path , # of lines
+			
+			Set<Map.Entry<String, Integer>> set = hm.entrySet(); 			// get hashmap set
+		    Iterator<Entry<String, Integer>> iterator = set.iterator();		// iterator <class and path, lineContributed>
+
+		    while(iterator.hasNext()) {						// get elements
+		    	Map.Entry<String, Integer> me = (Map.Entry<String, Integer>)iterator.next(); // String=key, Integer=value
+		    	String stationName = me.getKey();			// class and path
+		    	Integer lineContributed = me.getValue();
+		    	//if(!sList.isEmpty()){						// if station list is not empty
+		    		if(sList.containsValue(stationName)){	// if the class and path already exists
+		    			sList.get(stationName).addAuthor(authorName, me.getValue());
+		    		} else{									// else add the new station
+		    			sList.put(stationName, new Station(stationName, authorName+" "+lineContributed));
+		    		}
+		    	/*} else{									// initialize station list
+		    		sList.put(stationName, new Station(stationName,authorName+" "+lineContributed));
+		    	}*/
+		    }
+		}
+		System.out.println(sList);
+	}
+	
+	private void linkStations(){ // NOT DONE
+		Map<String, CallGraphNode> results = cgnList;
+	}
+
+	/**
+	 * Creates a coordinate marker for the visualizer
+	 * @param hm a hashmap of classes
+	 */
+	public void createMarker(HashMap<String, Station> hm){ //NOT DONE
 		try {
 			PrintWriter pw = new PrintWriter("Marker.json");
 			JSONWriter jsonW = new JSONWriter(pw);
@@ -62,7 +79,7 @@ public class Fuser {
 		         .key("type").value("FeatureCollection")
 		         	.key("features").array();
 		         		// loop
-		    			Set set = hm.entrySet(); 				// get hashmap set
+		    			Set<Map.Entry<String, Station>> set = hm.entrySet(); 				// get hashmap set
 		    			Iterator i = set.iterator();			// iterator
 		    			int j = 0;
 		    			while(i.hasNext()) {					// get elements
@@ -93,7 +110,7 @@ public class Fuser {
 			e.printStackTrace();
 		} 
 	}
-	public void createLine(String path, int nLines){
+	public void createLine(String path, int nLines){ // NOT DONE
 		PrintWriter pw;
 		try {
 			pw = new PrintWriter("Line.json");

@@ -12,14 +12,24 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CallGraphRunner {
-	
+	// Instant fields and constants
 	public static String callStrRe = "^M:(.*):(.*) \\([OMSI]\\)(.*):(.*)$";	
 	
+	/**
+	 * Generate a graph based on the target file
+	 * @param target 
+	 * @return Map<String, CallGraphNode> 
+	 */
 	public Map<String, CallGraphNode> generateGraph(String target) throws IOException {
 		List<String> output = run(target);
 		return parseOutput(output);
 	}
 	
+	/**
+	 * @param target a jar file to be analyzed
+	 * @return List<String>
+	 * 
+	 */
 	protected List<String> run(String target) throws IOException {
 		String loc = "lib/java-callgraph-static.jar";
 
@@ -40,7 +50,7 @@ public class CallGraphRunner {
 	/**
 	 * Parses a textual callgraph from java-callgraph to generate an internal callgraph.
 	 * @param output
-	 * @return a callgraph
+	 * @return Map<String, CallGraphNode> a callgraph
 	 */
 	protected Map<String, CallGraphNode> parseOutput(List<String> output) {
 		Map <String, CallGraphNode> nodeList = new HashMap<String, CallGraphNode>();
@@ -70,6 +80,10 @@ public class CallGraphRunner {
 				edge.addEdgeBetween(outNode, inNode);
 				
 				System.out.println(m.group(2) + " in " + m.group(1) + " calls method " + m.group(4) + " in " + m.group(3));
+				// group(2) = caller actual class
+				// group(1) = caller path
+				// group(4) = callee actual class
+				// group(3) = callee path
 			}
 		}
 		return nodeList;
