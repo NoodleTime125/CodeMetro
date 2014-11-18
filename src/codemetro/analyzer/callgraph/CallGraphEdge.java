@@ -60,4 +60,20 @@ public class CallGraphEdge {
 		}
 		return true;
 	}
+	
+	public String getCaller(){
+		return caller;
+	}
+	
+	public String getCallee(){
+		return callee;
+	}
+	
+	public CallGraphNode getCallerMethod(){
+		return from;
+	}
+	
+	public CallGraphNode getCalleeMethod(){
+		return to;
+	}
 }
