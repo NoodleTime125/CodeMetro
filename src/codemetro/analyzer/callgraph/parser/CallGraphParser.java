@@ -23,6 +23,14 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 
 import codemetro.analyzer.callgraph.*;
 
+/**
+ * Parses a java source repository to create a call graph.
+ * 
+ * Uses the JDT provided by Eclipse.
+ * 
+ * @author kenshen
+ *
+ */
 public class CallGraphParser {
 
 	ASTParser parser = ASTParser.newParser(AST.JLS8);
@@ -99,6 +107,12 @@ public class CallGraphParser {
 		System.out.println("Creating AST.");
 
 		System.out.println(Arrays.toString(srcPaths));
+		
+		/*
+		 * The environment must be set up according to 
+		 * http://help.eclipse.org/luna/index.jsp?topic=/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/dom/ASTParser.html
+		 */
+		
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		parser.setSource(javasrc);
 		parser.setEnvironment(classPaths.toArray(new String[classPaths.size()]), srcPaths, null, true);
@@ -133,9 +147,16 @@ public class CallGraphParser {
 				if (callee.getExpression() != null && callee.resolveMethodBinding() != null ) {
 					ITypeBinding type = callee.getExpression().resolveTypeBinding();
 					IMethodBinding  method = callee.resolveMethodBinding();
+					
+					// Type erasure on the type so we don't get duplicate entries for the same generic class.
+					String typeName = type.getQualifiedName();
+					if (type.isParameterizedType()){
+						typeName = type.getErasure().getQualifiedName();
+					}
+					
 					//System.out.println("Called " + method.getName() + " in class " + type.getQualifiedName());
 
-					addCall(callerClass, caller.getName().toString(), type.getQualifiedName(), method.getName());
+					addCall(callerClass, caller.getName().toString(), typeName, method.getName());
 				}
 				//System.out.println("Callees done.");
 			}
