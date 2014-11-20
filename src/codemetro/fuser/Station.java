@@ -11,6 +11,8 @@ public class Station {
 	private ArrayList<Train> outTrain;	// output parameter
 	private CallGraphNode cgn;			// CallGraphNode
 	private Point coordinate;
+	private double xCoordinate;
+	private double yCoordinate;
 	private ArrayList<String> aList;	// author list
 	
 	public Station(String name){
@@ -37,12 +39,31 @@ public class Station {
 	public void setName(String name){
 		this.stationName = name;
 	}
+	
+	/*
 	public void setCoordinate(double x, double y){
 		this.coordinate.setLocation(x,y);
 	}
 	public Point getCoordinate(){
 		return coordinate;
 	}
+	*/
+	
+	public void setXCoordinate(double x){
+		this.xCoordinate = x;
+	}
+	public void setYCoordinate(double y){
+		this.yCoordinate = y;
+	}
+	public double getXCoordinate(){
+		return this.xCoordinate;
+	}
+	public double getYCoordinate(){
+		return this.yCoordinate;
+	}
+	
+	
+	
 	/**
 	 * @param name name of the author
 	 * @param nLines number of lines the author has contributed

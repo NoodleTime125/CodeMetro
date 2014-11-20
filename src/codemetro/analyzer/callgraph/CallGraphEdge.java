@@ -32,6 +32,14 @@ public class CallGraphEdge {
 		to.addIncomingEdge(this);
 	}
 	
+	public String getCaller(){
+		return this.caller;
+	}
+	
+	public String getCallee(){
+		return this.callee;
+	}
+	
 	
 	@Override
 	/**

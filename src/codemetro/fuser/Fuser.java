@@ -8,14 +8,18 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.List;
 import java.lang.Math;
 
 import de.fhpotsdam.unfolding.data.Feature;
 import de.fhpotsdam.unfolding.data.Feature.FeatureType;
+import de.fhpotsdam.unfolding.data.ShapeFeature;
+import de.fhpotsdam.unfolding.geo.Location;
 
 import org.json.JSONException;
 import org.json.JSONWriter;
 
+import codemetro.analyzer.callgraph.CallGraphEdge;
 import codemetro.analyzer.callgraph.CallGraphNode;
 import codemetro.analyzer.gitinspector.GitInspectorEntry;
 
@@ -37,8 +41,9 @@ public class Fuser {
 		this.sList = new HashMap<String, Station>();		// <key, value>
 
 		
-		stationsMaker();	// GitInspector
-		linkStations();		// CallGraph
+		stationsMaker();			// GitInspector
+		linkStations();				// CallGraph
+		assignCoordianteStations(); // assign coordinates to a station
 	}
 	
 	private void stationsMaker(){
@@ -79,42 +84,91 @@ public class Fuser {
 	    	} 
 	    }
 	}
-
-	public Feature createMap(){
-		Feature f = new Feature(Feature.FeatureType.LINES);
+	
+	/*
+	 * assigns coordinates to stations in a circular pattern
+	 */
+	public void assignCoordianteStations(){
+		//Feature f = new Feature(Feature.FeatureType.LINES);
 		int stationCounter = 0;
 		double shell; 
 		int stationInShell = 0;
 		Iterator<Entry<String, Station>> it = sList.entrySet().iterator();
 		while(it.hasNext()){ 	// iterate through the list of Stations
 			shell = Math.floor(Math.log10(stationCounter)/Math.log10(2));
-			if(stationInShell >= Math.pow(2,shell)) stationInShell = 0; //reset to 0 , new stations will be in new shells
-			Map.Entry<String, Station> pairs = (Map.Entry<String, Station>)it.next();
-			// cos = x coordinate , sin = y coordinate	
-			pairs.getValue().setCoordinate(0.1*shell*Math.cos(Math.PI*stationInShell/Math.pow(2,shell)),0.1*shell*Math.sin(Math.PI*stationInShell/Math.pow(2,shell)));
 			
-			f.addProperty(pairs.getKey(),pairs.getValue());
+			if(stationInShell >= Math.pow(2,shell)) stationInShell = 0; //reset to 0 , new stations will be in new shells
+			
+			Map.Entry<String, Station> pairs = (Map.Entry<String, Station>)it.next();
+			// x = rcos(ANGLE) , y = rsin(ANGLE)
+			// assign coordinates
+			//pairs.getValue().setCoordinate(shell*Math.cos(Math.PI*stationInShell/Math.pow(2,shell)), shell*Math.sin(Math.PI*stationInShell/Math.pow(2,shell)));
+			pairs.getValue().setXCoordinate(shell*Math.cos(Math.PI*stationInShell/Math.pow(2,shell)));
+			pairs.getValue().setYCoordinate(shell*Math.sin(Math.PI*stationInShell/Math.pow(2,shell)));
+			//f.addProperty(pairs.getKey(),pairs.getValue());
 			
 			stationCounter++;							// Station# = counter
 			stationInShell++;
 		}
-		return f;
+		//return f;
+	}
+	
+	/**
+	 * a list of Features with caller and callee as a line based on callgraphnode
+	 * @return List<Feature> a list of line features of who's calling who
+	 */
+	public List<Feature> createTransit(){
+		List<Feature> fList = new ArrayList<Feature>();
+		
+		Iterator<Entry<String, Station>> it = sList.entrySet().iterator();
+		while(it.hasNext()){ 	// iterate through the list of Stations
+			Map.Entry<String, Station> pairs = (Map.Entry<String, Station>)it.next();
+			
+			// Station.CallGraphEdge.outgoing
+			ArrayList<CallGraphEdge> cgeOut = pairs.getValue().getCallGraphNode().outgoing;
+			// Station.CallGraphEdge.incoming
+			ArrayList<CallGraphEdge> cgeIn = pairs.getValue().getCallGraphNode().incoming;
+			
+			// iterate through outgoing calls
+			for(CallGraphEdge cge: cgeOut){
+				Feature f = new ShapeFeature(FeatureType.LINES);
+				((ShapeFeature) f).addLocation(new Location(sList.get(cge.getCaller()).getXCoordinate(),sList.get(cge.getCaller()).getYCoordinate()));	// caller
+				((ShapeFeature) f).addLocation(new Location(sList.get(cge.getCallee()).getXCoordinate(),sList.get(cge.getCallee()).getYCoordinate()));	// callee
+				fList.add(f);
+			}
+			
+			// iterate through incoming calls
+			for(CallGraphEdge cge: cgeIn){
+				Feature f = new ShapeFeature(FeatureType.LINES);
+				((ShapeFeature) f).addLocation(new Location(sList.get(cge.getCaller()).getXCoordinate(),sList.get(cge.getCaller()).getYCoordinate()));	// caller
+				((ShapeFeature) f).addLocation(new Location(sList.get(cge.getCallee()).getXCoordinate(),sList.get(cge.getCallee()).getYCoordinate()));	// callee
+				fList.add(f);
+			}
+		}
+		return fList;
+	}
+	
+	/**
+	 * returns a list of stations with coordinates
+	 * @return	HashMap<String, Station>
+	 */
+	public HashMap<String, Station> getStations(){
+		//HashMap<String, Station> = <classpath , station with properties>
+		return this.sList;
 	}
 	
 	
 	
 	
 	
-	
-	
-	
-	
-	
+	// don't need this anymore
 	/**
 	 * Creates a coordinate marker for the visualizer
 	 * @param hm a hashmap of classes
 	 */
+	/*
 	public void createMarker(HashMap<String, Station> hm){ //NOT DONE
+	
 		try {
 			PrintWriter pw = new PrintWriter("Marker.json");
 			JSONWriter jsonW = new JSONWriter(pw);
@@ -184,6 +238,5 @@ public class Fuser {
 			e.printStackTrace();
 		} 
 	}
-
-	
+	*/
 }
