@@ -39,11 +39,20 @@ public class MapPlot extends PApplet{
 	String yearStr = Integer.toString(year);
 	String name = "Testing";
 	boolean modifying = false;
+	List<MultiFeature> loMF;
+	
+	public MapPlot(List<MultiFeature> loMF) {
+		this.loMF = loMF;
+	}
+	
+	public MapPlot() {
+		
+	}
 	
 	/**
 	 * Setting up the visualizer
 	 */
-	public void setup(List<MultiFeature> loMF) {
+	public void setup() {
 		size(1280, 720, P2D); //setup size of applet, using OpenGL's PGraphics2D as the renderer
 		smooth(); //anti-aliase edges
 		noStroke();	
@@ -53,9 +62,11 @@ public class MapPlot extends PApplet{
 		
 		//testmethod();
 		
+		
 		for (int i = 0; i < loMF.size(); i++) {
 			addLine(loMF.get(i));
 		}
+		
 
 		
 		// Add mouse and keyboard interactions 
@@ -151,10 +162,7 @@ public class MapPlot extends PApplet{
 						train.setX(train.getLocations().get(0).x);
 						train.setY(train.getLocations().get(0).y);
 					}
-					//System.out.println("[" + train.getX() + ", " + train.getY() + "]");
-					//System.out.println(wayPoints.getFeatures().size());
 					ShapeFeature sF = (ShapeFeature) wayPoints.getFeatures().get(i);
-					//System.out.println(sF.getLocations().get(train.getIndexWayPoint()));
 					int result = moveTrains(train, sF.getLocations().get(train.getIndexWayPoint()));
 					if (result == -1) { //TODO
 						
