@@ -49,9 +49,9 @@ public class CallGraphParser {
 	 * @throws IOException 
 	 */
 	public Map<String, CallGraphNode> generateGraph(String target) throws IOException{
-		Path path = new File(target).toPath().toAbsolutePath().normalize();
+		projectRoot = new File(target).toPath().toAbsolutePath().normalize();
 		// Figure out the project root.
-		projectRoot = path.getParent().toAbsolutePath().normalize();
+		Path path = projectRoot.resolve("src");
 		System.out.println("Project root is " + projectRoot);
 		srcPaths = new String[]{path.toString()};
 		System.out.println("Project src path is " + srcPaths[0]);
