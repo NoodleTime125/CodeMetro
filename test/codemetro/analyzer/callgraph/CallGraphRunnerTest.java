@@ -2,6 +2,8 @@ package codemetro.analyzer.callgraph;
 
 import org.junit.Test;
 
+import codemetro.analyzer.callgraph.parser.CallGraphParser;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,11 +15,11 @@ import junit.framework.TestCase;
 
 public class CallGraphRunnerTest extends TestCase{
 
-	private CallGraphRunner instance = new CallGraphRunner();	// CallGraphRunner class
+	private CallGraphParser instance = new CallGraphParser();	// CallGraphRunner class
 	
 	@Test
 	public void test() throws IOException{
-		instance.generateGraph("lib/core.jar");
+		instance.generateGraph(".");
 	}
 	
 
