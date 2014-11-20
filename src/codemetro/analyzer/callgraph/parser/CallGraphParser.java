@@ -65,7 +65,7 @@ public class CallGraphParser {
 		}
 
 		parseSource(path);
-		return null;
+		return nodeList;
 	}
 
 	/**

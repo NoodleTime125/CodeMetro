@@ -3,6 +3,7 @@ package codemetro;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Scanner;
 
 import codemetro.analyzer.callgraph.CallGraphNode;
 import codemetro.analyzer.callgraph.CallGraphRunner;
@@ -20,9 +21,12 @@ public class CodeMetro {
 	 */
 	public static void main(String[] args) {
 		//TODO Call both call graph and gitinspector.
-		String repoRoot = ".";
+		System.out.println("Please input the path to the directory of the repository.");
+		Scanner scan = new Scanner(System.in);
+		
+		String repoRoot = scan.nextLine();
+		
 		Map <String, CallGraphNode> callGraph;
-
 		CallGraphParser cg = new CallGraphParser();
 		try {
 			callGraph = cg.generateGraph(repoRoot);
