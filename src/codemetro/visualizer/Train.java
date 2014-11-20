@@ -21,8 +21,10 @@ public class Train {
 	int indexWayPoint;
 	SimplePointMarker marker;
 	List<Location> loc = new ArrayList<Location>();
+	List<Feature> loF;
+	MultiFeature mf;
 	int waypointNum = 0;
-	MultiFeature wayPoint;
+	int globalwpindex;
 	
 	/**
 	 * Constructor
@@ -143,19 +145,47 @@ public class Train {
 	public SimplePointMarker getTrain() {
 		return marker;
 	}
+	
+	public void setMultiFeat(MultiFeature mf) {
+		this.mf = mf;
+	}
+	
+	public MultiFeature getwayPoint() {
+		return mf;
+	}
+	
+	public void setloF(List<Feature> loF) {
+		this.loF = loF;
+	}
+	
+	public List<Feature> getloF() {
+		return loF;
+	}
+	
+	public int getglobalwpindex() {
+		return globalwpindex;
+	}
+	
+	public void setglobalwpindex(int globalwpindex) {
+		this.globalwpindex = globalwpindex;
+	}
+	
 	/**
 	 * @param map coordinates
 	 */
-	public void moveTrain(MapPlot map){
-		if (waypointNum == loc.size() - 1){
+	public synchronized int moveTrain(MapPlot map){
+		if (waypointNum == loc.size() - 1){ //reset back to beginning of the line if train is at the end
 			waypointNum = 0;
 			x = loc.get(waypointNum).x;
 			y = loc.get(waypointNum).y;
 		}
 		
-		if (x != loc.get(waypointNum).x && y != loc.get(waypointNum).y) { //bug fix...sometimes y or x axis isn't animated...just pop it back onto the line
+		float epsilon = 0.1f;
+		if (Math.abs(x - loc.get(waypointNum).x) > epsilon || Math.abs(y - loc.get(waypointNum).y) > epsilon) { //bug fix...sometimes y or x axis isn't animated...just pop it back onto the line
+			System.out.println("ohoh!, loc has " + loc.get(waypointNum) + "train xy is (" + x + ", " + y + ")");
 			x = loc.get(waypointNum).x;
 			y = loc.get(waypointNum).y;
+			return -1;
 		}
 		
 		Easing currentEasing;
@@ -172,6 +202,6 @@ public class Train {
 		
 		Ani.to(this, 4f, "x", loc.get(waypointNum).x, currentEasing);
 		Ani.to(this, 4f, "y", loc.get(waypointNum).y, currentEasing);
-
+		return 1;
 	}
 }
