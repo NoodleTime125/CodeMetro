@@ -71,10 +71,21 @@ public class GitInspector {
 				m.find();
 				//System.out.println(m.group(1) + " lines written for " + m.group(2));
 				x = Integer.valueOf(m.group(1));
-				gie.fileEntry(x, m.group(2));
+				gie.fileEntry(x, getPackageName(m.group(2)));
 			}
 		}
 		System.out.println(list);
 		return list;
+	}
+	
+	public String getPackageName(String s) {
+		String x = s.replaceAll("/", ".");
+		int Index = x.indexOf(".");
+		System.out.println(Index);
+		String blank = "";
+		String toBeReplaced = x.substring(0 , Index+1);
+		x = x.replace(toBeReplaced, blank);
+		System.out.println(x);
+		return x;
 	}
 }
