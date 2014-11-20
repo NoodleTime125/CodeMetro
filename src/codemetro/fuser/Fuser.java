@@ -12,6 +12,7 @@ import java.util.List;
 import java.lang.Math;
 
 import de.fhpotsdam.unfolding.data.Feature;
+import de.fhpotsdam.unfolding.data.MultiFeature;
 import de.fhpotsdam.unfolding.data.Feature.FeatureType;
 import de.fhpotsdam.unfolding.data.ShapeFeature;
 import de.fhpotsdam.unfolding.geo.Location;
@@ -117,7 +118,7 @@ public class Fuser {
 	 * a list of Features with caller and callee as a line based on callgraphnode
 	 * @return List<Feature> a list of line features of who's calling who
 	 */
-	public List<Feature> createTransit(){
+	public List<MultiFeature> createTransit(){
 		List<Feature> fList = new ArrayList<Feature>();
 		
 		Iterator<Entry<String, Station>> it = sList.entrySet().iterator();
@@ -145,7 +146,13 @@ public class Fuser {
 				fList.add(f);
 			}
 		}
-		return fList;
+		List<MultiFeature> mFeatList = new ArrayList<MultiFeature>();
+		for(Feature feat: fList){
+			MultiFeature mFeat = new MultiFeature();
+			mFeat.addFeature(feat);
+			mFeatList.add(mFeat);
+		}
+		return mFeatList;
 	}
 	
 	/**

@@ -56,7 +56,7 @@ public class MapPlot extends PApplet{
 		for (int i = 0; i < loMF.size(); i++) {
 			addLine(loMF.get(i));
 		}
-		
+
 		
 		// Add mouse and keyboard interactions 
 		//TODO Remove in the future, we don't want users to fiddle with the map.

@@ -32,15 +32,6 @@ public class CallGraphEdge {
 		to.addIncomingEdge(this);
 	}
 	
-	public String getCaller(){
-		return this.caller;
-	}
-	
-	public String getCallee(){
-		return this.callee;
-	}
-	
-	
 	@Override
 	/**
 	 * Checks if an object is a CallGraphEdge or a String
@@ -59,5 +50,21 @@ public class CallGraphEdge {
 			return false;
 		}
 		return true;
+	}
+	
+	public String getCaller(){
+		return caller;
+	}
+	
+	public String getCallee(){
+		return callee;
+	}
+	
+	public CallGraphNode getCallerMethod(){
+		return from;
+	}
+	
+	public CallGraphNode getCalleeMethod(){
+		return to;
 	}
 }

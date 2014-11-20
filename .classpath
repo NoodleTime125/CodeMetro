@@ -16,7 +16,17 @@
 	<classpathentry kind="lib" path="lib/json4processing.jar"/>
 	<classpathentry kind="lib" path="lib/libTUIO.jar"/>
 	<classpathentry kind="lib" path="lib/unfolding.0.9.6.jar"/>
+	<classpathentry kind="lib" path="lib/commons-io-2.4.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/Ani.jar"/>
+	<classpathentry kind="lib" path="lib/callGraphDependencies/org.eclipse.contenttype-3.4.200-v20140207-1251.jar"/>
+	<classpathentry kind="lib" path="lib/callGraphDependencies/org.eclipse.core.resources-3.7.100.jar"/>
+	<classpathentry kind="lib" path="lib/callGraphDependencies/org.eclipse.equinox.common_3.6.200.v20130402-1505.jar"/>
+	<classpathentry kind="lib" path="lib/callGraphDependencies/org.eclipse.equinox.preferences_3.5.200.v20140224-1527.jar"/>
+	<classpathentry kind="lib" path="lib/callGraphDependencies/org.eclipse.jobs-3.6.0-v20140424-0053.jar"/>
+	<classpathentry kind="lib" path="lib/callGraphDependencies/org.eclipse.osgi_3.10.1.v20140909-1633.jar"/>
+	<classpathentry kind="lib" path="lib/callGraphDependencies/org.eclipse.runtime-3.10.0-v20140318-2214.jar"/>
+	<classpathentry kind="lib" path="lib/jdt/features/org.eclipse.jdt_3.10.0.v20140925-0400.jar"/>
+	<classpathentry kind="lib" path="lib/jdt/plugins/org.eclipse.jdt.core_3.10.0.v20140902-0626.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
