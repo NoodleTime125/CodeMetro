@@ -2,6 +2,7 @@ package codemetro;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -11,6 +12,7 @@ import codemetro.analyzer.callgraph.parser.CallGraphParser;
 import codemetro.analyzer.gitinspector.GitInspector;
 import codemetro.analyzer.gitinspector.GitInspectorEntry;
 import codemetro.fuser.Fuser;
+import de.fhpotsdam.unfolding.data.Feature;
 
 public class CodeMetro {
 
@@ -42,7 +44,8 @@ public class CodeMetro {
 //		ArrayList<GitInspectorEntry> c2 = gi2.parseOutput();
 		
 		//TODO Fuse both metrics into station/train.
-		new Fuser(c1, callGraph);
+		Fuser f = new Fuser(c1, callGraph);
+		List<Feature> feat = f.createTransit();
 		//TODO convert into visualizer input
 		//TODO visualize
 		} catch (IOException e) {

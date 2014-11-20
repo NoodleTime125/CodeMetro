@@ -51,7 +51,7 @@ public class MapPlot extends PApplet{
 		Ani.setDefaultEasing(Ani.QUAD_IN_OUT);
 		metro = new UnfoldingMap(this, new Google.GoogleSimplifiedProvider()); //TODO using GoogleSimplified2Provider for now...find a better map style
 		
-		testmethod();
+		//testmethod();
 		
 		// Add mouse and keyboard interactions 
 		//TODO Remove in the future, we don't want users to fiddle with the map.
