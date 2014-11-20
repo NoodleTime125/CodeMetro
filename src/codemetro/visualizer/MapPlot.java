@@ -13,6 +13,7 @@ import de.fhpotsdam.unfolding.marker.*;
 //Ani
 import de.looksgood.ani.*;
 
+import java.util.Collections;
 //Java Default Libraries
 import java.util.Timer;
 import java.util.List;
@@ -27,12 +28,13 @@ public class MapPlot extends PApplet{
 	float x = 0;
 	float y = 0;
 	List<Train> trainManager = new ArrayList<Train>();
-	List<Feature> allLoFL = new ArrayList<Feature>(); //contains all the Features in a List
+	List<Feature> allLoFL = Collections.synchronizedList(new ArrayList<Feature>()); //contains all the Features in a List
 	List<MultiFeature> newlyadded = new ArrayList<MultiFeature>(); //contains the features that we will add to the current metro map
 	MultiFeature wayPoints = new MultiFeature(); //contains the wayPoints for all the lines
 	Random rand = new Random(100);
 	int year = 1980;
 	int yearcounter = 0;
+	String completed = "Subway Construction Completed";
 	String yearStr = Integer.toString(year);
 	String name = "Testing";
 	
@@ -58,13 +60,6 @@ public class MapPlot extends PApplet{
 		int zoomLv = 6; //the level of zoom for the map (0 = world view, bigger number = more zoom) use 12
 		metro.zoomAndPanTo(zoomLv, testMap);
 		
-		Timer featureTimer = new Timer();
-		featureTimer.schedule(new FeatureTimerTask(allLoFL) {
-			@Override
-			public void run() {
-				//run(allLoFL);
-			}
-		}, 2000, 4075);
 		List<Feature> loFL = allLoFL;
 
 		//System.out.println("\n");
@@ -79,7 +74,6 @@ public class MapPlot extends PApplet{
 		List<Feature> test; //TODO remove later when Angelo's stuff works
 		String JSONLineFile = "mockLine.json"; //TODO remove later when Angelo's stuff works
 		test = GeoJSONReader.loadData(this, JSONLineFile); //TODO remove later when Angelo's stuff works
-		//for(int i = 0; i < test.size(); i++) {
 			MultiFeature mfeat = new MultiFeature();
 			MultiFeature mfeat2 = new MultiFeature();
 			MultiFeature mfeat3 = new MultiFeature();
@@ -94,7 +88,6 @@ public class MapPlot extends PApplet{
 			
 			mfeat3.addFeature(test.get(4));
 			addLine(mfeat3);
-		//}
 	}
 
 	private void linetoStation(List<Feature> loFL) { //gets the stations from a line
@@ -128,7 +121,7 @@ public class MapPlot extends PApplet{
 		timer.schedule(new VariableTimerTask(trainManager) {
 			@Override
 			public void run() {
-				if (newlyadded.size() > 0 && yearcounter == 0) {
+				if (newlyadded.size() > 0 && yearcounter == 0) { //adds the newly added line to the map
 					List<Feature> templist = new ArrayList<Feature>();
 					for (int i = 0; i < newlyadded.get(0).getFeatures().size(); i++) {
 						templist.add(newlyadded.get(0).getFeatures().get(i));
@@ -142,7 +135,7 @@ public class MapPlot extends PApplet{
 					newlyadded.remove(0);
 
 				}
-				for (int i = 0; i < trainManager.size(); i++) {
+				for (int i = 0; i < trainManager.size(); i++) { //moves each train to the next waypoint
 					Train train = trainManager.get(i);
 					if (train.getIndexWayPoint() == 0) {
 						train.setX(train.getLocations().get(0).x);
@@ -224,7 +217,6 @@ public class MapPlot extends PApplet{
 	
 	public MultiFeature plotLines(UnfoldingMap metro, List<Feature> loFL) { //loFL is the list of points we want as a line
 		//Plot Lines
-		//List<List<Location>> loloL = new ArrayList<List<Location>>();
 		MultiFeature mF = listToMultiFeat(loFL);
 
 		for (int index = 0; index < loFL.size(); index++) { //for each polyline set
@@ -310,6 +302,14 @@ public class MapPlot extends PApplet{
 		train.moveTrain(this);	
 	}
 	
+	private String subwaystatus() {
+		if (newlyadded.size() == 0) {
+			return completed;
+		} else {
+			return "";
+		}
+	}
+	
 	/**
 	 * Updates and draw the map using the draw() method of UnfoldingMap class
 	 * Puts a list of train with their respective coordinates
@@ -326,6 +326,7 @@ public class MapPlot extends PApplet{
 		fill(color(0,0,0));
 		text("City name: " + name, 10, 40);
 		text("Year: " + year, 1100, 40); //TODO use relative screen position
+		text(subwaystatus(), 400, 700);
 		
 		for (int i = 0; i < trainManager.size(); i++) {
 			Train train = trainManager.get(i);
