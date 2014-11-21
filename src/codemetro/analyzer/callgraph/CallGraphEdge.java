@@ -30,7 +30,10 @@ public class CallGraphEdge {
 		this.to = to;
 		from.addOutgoingEdge(this);
 		to.addIncomingEdge(this);
-		System.out.println("Adding edge" + this);
+		System.out.println("Adding edge " + this);
+		if (from.getName().equals("") || to.getName().equals("")){
+			System.err.println("ERROR: Missing stuff at " + this );
+		}
 	}
 	
 	@Override

@@ -6,13 +6,14 @@ import java.util.HashMap;
 
 import codemetro.analyzer.callgraph.CallGraphNode;
 import codemetro.analyzer.gitinspector.GitInspectorEntry;
+import de.fhpotsdam.unfolding.geo.Location;
 
 public class Station {
 	private String stationName;			// class and path name
 	private ArrayList<Train> inTrain = new ArrayList<Train>(); 	// input parameter
 	private ArrayList<Train> outTrain = new ArrayList<Train>();	// output parameter
 	private CallGraphNode cgn;			// CallGraphNode
-	private Point coordinate;
+	private Location coordinate;
 	private double xCoordinate;
 	private double yCoordinate;
 	private HashMap<String, Integer> aList = new HashMap<String, Integer>();;	// author list
@@ -40,17 +41,12 @@ public class Station {
 	}
 	*/
 	
-	public void setXCoordinate(double x){
-		this.xCoordinate = x;
+	public void setLocation(Location loc){
+		coordinate = loc;
 	}
-	public void setYCoordinate(double y){
-		this.yCoordinate = y;
-	}
-	public double getXCoordinate(){
-		return this.xCoordinate;
-	}
-	public double getYCoordinate(){
-		return this.yCoordinate;
+	
+	public Location getLocation(){
+		return coordinate;
 	}
 	
 	
@@ -63,6 +59,9 @@ public class Station {
 		aList.put(name, nLines);
 	}
 	
+	public HashMap<String, Integer> getAuthors(){
+		return aList;
+	}
 	/**
 	 * adds a train to an array list of trains
 	 * @param s name of train

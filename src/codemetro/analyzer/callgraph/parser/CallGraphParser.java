@@ -128,10 +128,13 @@ public class CallGraphParser {
 		for (MethodDeclaration caller : visitor.getCallers()) {
 			IMethodBinding callerName = caller.resolveBinding();
 			String callerClass = callerName.getDeclaringClass().getQualifiedName();
+			
 			if (callerClass.equals("")){
+				//Class not found.
 				continue;
 			}
-			//System.err.println("Testing declaring class: " + callerClass);	
+			
+			//System.out.println("Testing declaring class: " + callerClass);
 
 			//System.out.println("Method name: " + caller.getName()
 			//		+ " Return type: " + caller.getReturnType2());

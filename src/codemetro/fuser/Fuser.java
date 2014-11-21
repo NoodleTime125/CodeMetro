@@ -16,6 +16,7 @@ import de.fhpotsdam.unfolding.data.MultiFeature;
 import de.fhpotsdam.unfolding.data.Feature.FeatureType;
 import de.fhpotsdam.unfolding.data.ShapeFeature;
 import de.fhpotsdam.unfolding.geo.Location;
+import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 
 import org.json.JSONException;
 import org.json.JSONWriter;
@@ -74,7 +75,7 @@ public class Fuser {
 		    		} else{									// else add the new station
 		    			Station station = new Station(stationName);
 		    			station.addAuthor(authorName, lineContributed);
-		    			sList.put(stationName, station);
+		    			//sList.put(stationName, station);
 		    			System.err.println("Creating and adding new station to sList \"" + stationName  + "\" for author " + authorName);
 		    		}
 		    	/*} else{									// initialize station list
@@ -96,7 +97,7 @@ public class Fuser {
 	    		sList.get(me.getKey()).setCallGraphNode(me.getValue());
 	    		
 	    		System.out.println("linkStations: Station found. " + me.getKey());
-	    		System.out.println(me.getValue());
+	    		//System.out.println(me.getValue());
 	    	} else {
 	    		System.err.println("linkStations: Station not found. " + me.getKey());
 	    	}
@@ -121,8 +122,10 @@ public class Fuser {
 			// x = rcos(ANGLE) , y = rsin(ANGLE)
 			// assign coordinates
 			//pairs.getValue().setCoordinate(shell*Math.cos(Math.PI*stationInShell/Math.pow(2,shell)), shell*Math.sin(Math.PI*stationInShell/Math.pow(2,shell)));
-			pairs.getValue().setXCoordinate(shell*Math.cos(Math.PI*stationInShell/Math.pow(2,shell)));
-			pairs.getValue().setYCoordinate(shell*Math.sin(Math.PI*stationInShell/Math.pow(2,shell)));
+			double x = shell*Math.cos(Math.PI*stationInShell/Math.pow(2,shell));
+			double y = shell*Math.sin(Math.PI*stationInShell/Math.pow(2,shell));
+			
+			pairs.getValue().setLocation(new Location(x, y));
 			//f.addProperty(pairs.getKey(),pairs.getValue());
 			
 			stationCounter++;							// Station# = counter
@@ -142,27 +145,25 @@ public class Fuser {
 		System.out.println(sList);
 		while(it.hasNext()){ 	// iterate through the list of Stations
 			Map.Entry<String, Station> pairs = (Map.Entry<String, Station>)it.next();
-			
+
 			// Station.CallGraphEdge.outgoing
 			ArrayList<CallGraphEdge> cgeOut = pairs.getValue().getCallGraphNode().outgoing;
 			
 			// iterate through outgoing calls
 			for(CallGraphEdge cge: cgeOut){
 				ShapeFeature f = new ShapeFeature(FeatureType.LINES);
-				double callerX = sList.get(cge.getCallerClass().getName()).getXCoordinate();
-				double callerY = sList.get(cge.getCallerClass().getName()).getYCoordinate();
-				Location callerLoc = new Location(callerX, callerY);
+
+				Location callerLoc = sList.get(cge.getCallerClass().getName()).getLocation();
 				f.addProperty("caller", cge.getCalleeClass().getName());
 				f.addLocation(callerLoc);	// caller
 				
-				double calleeX = sList.get(cge.getCalleeClass().getName()).getXCoordinate();
-				double calleeY = sList.get(cge.getCalleeClass().getName()).getYCoordinate();
-				Location calleeLoc = new Location(calleeX, calleeY);
+				Location calleeLoc = sList.get(cge.getCalleeClass().getName()).getLocation();
 				f.addProperty("callee", cge.getCalleeClass().getName());
 				f.addLocation(calleeLoc);	// callee
 				
 				fList.add(f);
 			}
+
 		}
 		List<MultiFeature> mFeatList = new ArrayList<MultiFeature>();
 		for(Feature feat: fList){
@@ -173,6 +174,24 @@ public class Fuser {
 		return mFeatList;
 	}
 	
+	public List<SimplePointMarker> createStationMarkers(){
+		List<SimplePointMarker> list = new ArrayList<SimplePointMarker>();
+			Iterator<Entry<String, Station>> sIter = sList.entrySet().iterator();
+			while (sIter.hasNext()){
+				Entry<String, Station> entry = sIter.next();
+				Station station = entry.getValue();
+				HashMap<String, Object> properties = new HashMap<String, Object>();
+				
+				properties.put("authors", station.getAuthors());
+				SimplePointMarker marker = new SimplePointMarker();
+				marker.setProperties(properties);
+				marker.setLocation(station.getLocation());
+				marker.setId(station.getName());
+				
+				list.add(marker);
+			}
+		return list;
+	}
 	/**
 	 * returns a list of stations with coordinates
 	 * @return	HashMap<String, Station>
