@@ -30,6 +30,7 @@ public class CallGraphEdge {
 		this.to = to;
 		from.addOutgoingEdge(this);
 		to.addIncomingEdge(this);
+		System.out.println("Adding edge" + this);
 	}
 	
 	@Override
@@ -60,11 +61,15 @@ public class CallGraphEdge {
 		return callee;
 	}
 	
-	public CallGraphNode getCallerMethod(){
+	public CallGraphNode getCallerClass(){
 		return from;
 	}
 	
-	public CallGraphNode getCalleeMethod(){
+	public CallGraphNode getCalleeClass(){
 		return to;
 	}
-}
+	
+	public String toString(){
+		return from.className +"." + caller +  " --> " + to.className + "." + callee;
+	}
+} 

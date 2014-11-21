@@ -22,9 +22,9 @@ public class GitInspectorEntry {
 	 * @param s file entry
 	 */
 	public void fileEntry(Integer i, String s) {
-		//System.out.println("start file entry");
+		System.out.println("start file entry");
 		hm.put(s, i);
-		//System.out.println("added file entry");
+		System.out.println("added file entry");
 	}
 	@Override
 	/**
