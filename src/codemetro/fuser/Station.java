@@ -16,7 +16,7 @@ public class Station {
 	private Location coordinate;
 	private double xCoordinate;
 	private double yCoordinate;
-	private HashMap<String, Integer> aList = new HashMap<String, Integer>();;	// author list
+	private HashMap<String, Integer> aList = new HashMap<String, Integer>();	// author list
 	
 	public Station(String name){
 		this.stationName = name;

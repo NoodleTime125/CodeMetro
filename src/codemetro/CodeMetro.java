@@ -22,10 +22,14 @@ import codemetro.fuser.Fuser;
 import codemetro.visualizer.MapPlot;
 import de.fhpotsdam.unfolding.data.Feature;
 import de.fhpotsdam.unfolding.data.MultiFeature;
+import de.fhpotsdam.unfolding.data.ShapeFeature;
+import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 
 public class CodeMetro{
 
-	List<MultiFeature> feat;
+	List<ShapeFeature> feat;
+	List<SimplePointMarker> stationMarkers;
+	public Fuser fuser;
 	/**
 	 * Main method
 	 * @param args
@@ -69,7 +73,9 @@ public class CodeMetro{
 
 				//TODO Fuse both metrics into station/train.
 				Fuser f = new Fuser(c1, callGraph);
+				fuser = f;
 				feat = f.createTransit();
+				stationMarkers = f.createStationMarkers();
 				//TODO convert into visualizer input
 				//TODO visualize
 				//System.out.println(feat);
@@ -79,7 +85,11 @@ public class CodeMetro{
 		}
 	}
 	
-	public List<MultiFeature> getFeatures(){
+	public List<ShapeFeature> getFeatures(){
 		return feat;
+	}
+	
+	public List<SimplePointMarker> getStationMarkers(){
+		return stationMarkers;
 	}
 }

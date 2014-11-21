@@ -110,21 +110,23 @@ public class Fuser {
 	public void assignCoordianteStations(){
 		//Feature f = new Feature(Feature.FeatureType.LINES);
 		int stationCounter = 0;
-		double shell; 
+		double shell = 0; 
 		int stationInShell = 0;
 		Iterator<Entry<String, Station>> it = sList.entrySet().iterator();
 		while(it.hasNext()){ 	// iterate through the list of Stations
-			shell = Math.floor(Math.log10(stationCounter)/Math.log10(2));
+			shell = Math.floor(Math.log10(stationCounter + 1)/Math.log10(2));
 			
-			if(stationInShell >= Math.pow(2,shell)) stationInShell = 0; //reset to 0 , new stations will be in new shells
+			if(stationInShell > Math.pow(2,shell)) stationInShell = 0; //reset to 0 , new stations will be in new shells
 			
 			Map.Entry<String, Station> pairs = (Map.Entry<String, Station>)it.next();
 			// x = rcos(ANGLE) , y = rsin(ANGLE)
 			// assign coordinates
 			//pairs.getValue().setCoordinate(shell*Math.cos(Math.PI*stationInShell/Math.pow(2,shell)), shell*Math.sin(Math.PI*stationInShell/Math.pow(2,shell)));
-			double x = shell*Math.cos(Math.PI*stationInShell/Math.pow(2,shell));
-			double y = shell*Math.sin(Math.PI*stationInShell/Math.pow(2,shell));
-			
+			double x = shell*Math.cos((2*Math.PI*stationInShell+.5*shell)/Math.pow(2,shell));
+			double y = shell*Math.sin((2*Math.PI*stationInShell+.5*shell)/Math.pow(2,shell));
+			System.err.println("Shell " + shell);
+			System.err.println("Setting station " + pairs.getValue().getName());
+			System.err.println(" to " + x + " and " + y);
 			pairs.getValue().setLocation(new Location(x, y));
 			//f.addProperty(pairs.getKey(),pairs.getValue());
 			
@@ -138,11 +140,12 @@ public class Fuser {
 	 * a list of Features with caller and callee as a line based on callgraphnode
 	 * @return List<Feature> a list of line features of who's calling who
 	 */
-	public List<MultiFeature> createTransit(){
-		List<Feature> fList = new ArrayList<Feature>();
+	public List<ShapeFeature> createTransit(){
+		List<ShapeFeature> fList = new ArrayList<ShapeFeature>();
 		
 		Iterator<Entry<String, Station>> it = sList.entrySet().iterator();
 		System.out.println(sList);
+
 		while(it.hasNext()){ 	// iterate through the list of Stations
 			Map.Entry<String, Station> pairs = (Map.Entry<String, Station>)it.next();
 
@@ -154,24 +157,19 @@ public class Fuser {
 				ShapeFeature f = new ShapeFeature(FeatureType.LINES);
 
 				Location callerLoc = sList.get(cge.getCallerClass().getName()).getLocation();
-				f.addProperty("caller", cge.getCalleeClass().getName());
+				f.addProperty("caller", cge.getCallerClass());
 				f.addLocation(callerLoc);	// caller
 				
 				Location calleeLoc = sList.get(cge.getCalleeClass().getName()).getLocation();
-				f.addProperty("callee", cge.getCalleeClass().getName());
+				f.addProperty("callee", cge.getCalleeClass());
 				f.addLocation(calleeLoc);	// callee
 				
+				f.addProperty("edge", cge);
 				fList.add(f);
 			}
 
 		}
-		List<MultiFeature> mFeatList = new ArrayList<MultiFeature>();
-		for(Feature feat: fList){
-			MultiFeature mFeat = new MultiFeature();
-			mFeat.addFeature(feat);
-			mFeatList.add(mFeat);
-		}
-		return mFeatList;
+		return fList;
 	}
 	
 	public List<SimplePointMarker> createStationMarkers(){
@@ -183,6 +181,7 @@ public class Fuser {
 				HashMap<String, Object> properties = new HashMap<String, Object>();
 				
 				properties.put("authors", station.getAuthors());
+				properties.put("data", station.getCallGraphNode());
 				SimplePointMarker marker = new SimplePointMarker();
 				marker.setProperties(properties);
 				marker.setLocation(station.getLocation());
@@ -199,6 +198,10 @@ public class Fuser {
 	public HashMap<String, Station> getStations(){
 		//HashMap<String, Station> = <classpath , station with properties>
 		return this.sList;
+	}
+	
+	public ArrayList<GitInspectorEntry> getGieList() {
+		return gieList;
 	}
 	
 	

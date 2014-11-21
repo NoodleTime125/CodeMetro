@@ -24,6 +24,15 @@ public class MapPlotTest {
 	UnfoldingMap uMap = new UnfoldingMap(p, new Google.GoogleSimplifiedProvider());
 	
 	@Test
+	public void testRun() {
+		PApplet.main("codemetro.visualizer.MapPlot");
+		//PApplet.main(new String[] { "codemetro.visualizer.MapPlot" });
+		//MapPlot m = new MapPlot();
+		//m.setup();
+	}
+	
+	/*
+	@Test
 	public void testGetLocationFromJSON() {
 		List<Feature> loF = new ArrayList<Feature>();
 		loF = GeoJSONReader.loadData(p, "./test/mockMarker.json");
@@ -117,4 +126,5 @@ public class MapPlotTest {
 		} else
 			assertFalse(true);
 	}
+	*/
 }

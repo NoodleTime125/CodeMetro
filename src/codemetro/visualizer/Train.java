@@ -17,14 +17,13 @@ public class Train {
 	float x;
 	float y;
 	Location location;
-	int indexLocation;
-	int indexWayPoint;
 	SimplePointMarker marker;
 	List<Location> loc = new ArrayList<Location>();
 	List<Feature> loF;
 	MultiFeature mf;
 	int waypointNum = 0;
-	int globalwpindex;
+	ShapeFeature sf;
+	int indexWayPoint;
 	
 	/**
 	 * Constructor
@@ -36,6 +35,7 @@ public class Train {
 		this.y = Y;
 		marker = new SimplePointMarker(new Location(x, y));
 	}
+	
 	/**
 	 * Constructor
 	 * @param loc contains x and y coordinates
@@ -45,6 +45,19 @@ public class Train {
 		this.y = loc.y;
 		marker = new SimplePointMarker(loc);
 	}
+	
+	public Train(ShapeFeature feat){
+		this.sf = feat;
+		this.x = feat.getLocations().get(0).x;
+		this.y = feat.getLocations().get(0).y;
+		marker = new SimplePointMarker(new Location(x, y));
+		loc = feat.locations;
+	}
+	
+	public void setWayPoints(ShapeFeature sF){
+		loc = sF.locations;
+	}
+	
 	/**
 	 * Set way points based on the list of locations
 	 * @param feat list of locations
@@ -61,24 +74,14 @@ public class Train {
 	public List<Location> getLocations() {
 		return loc;
 	}
-	/**
-	 * @param i index of a location
-	 */
-	public void setIndexLocation(int i) {
-		this.indexLocation = i;
-	}
+	
 	/**
 	 * @param i index of a way point
 	 */ 
 	public void setIndexWayPoint(int i) {
 		this.indexWayPoint = i;
 	}
-	/**
-	 * @return int index of a location
-	 */
-	public int getIndexLocation() {
-		return indexLocation;
-	}
+
 	/**
 	 * @return int index of a waypoint
 	 */
@@ -105,8 +108,7 @@ public class Train {
 	}
 	
 	public Location getLocation() {
-		location.set(x, y);
-		return location;
+		return new Location(x, y);
 	}
 	
 	/**
@@ -120,11 +122,6 @@ public class Train {
 	 */
 	public float getY() {
 		return y;
-	}
-	
-	public Location getLoc() {
-		Location loc = new Location(x, y);
-		return loc;
 	}
 	
 	/**
@@ -162,14 +159,6 @@ public class Train {
 		return loF;
 	}
 	
-	public int getglobalwpindex() {
-		return globalwpindex;
-	}
-	
-	public void setglobalwpindex(int globalwpindex) {
-		this.globalwpindex = globalwpindex;
-	}
-	
 	/**
 	 * @param map coordinates
 	 */
@@ -182,7 +171,7 @@ public class Train {
 		
 		float epsilon = 0.1f;
 		if (Math.abs(x - loc.get(waypointNum).x) > epsilon || Math.abs(y - loc.get(waypointNum).y) > epsilon) { //bug fix...sometimes y or x axis isn't animated...just pop it back onto the line
-			System.out.println("ohoh!, loc has " + loc.get(waypointNum) + "train xy is (" + x + ", " + y + ")");
+			//System.out.println("ohoh!, loc has " + loc.get(waypointNum) + "train xy is (" + x + ", " + y + ")");
 			x = loc.get(waypointNum).x;
 			y = loc.get(waypointNum).y;
 			return -1;

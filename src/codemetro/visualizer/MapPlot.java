@@ -13,14 +13,31 @@ import de.fhpotsdam.unfolding.marker.*;
 //Ani
 import de.looksgood.ani.*;
 
+import java.awt.BorderLayout;
+import java.awt.event.WindowEvent;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 //Java Default Libraries
 import java.util.Timer;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+
 import codemetro.CodeMetro;
+import codemetro.analyzer.callgraph.CallGraphEdge;
+import codemetro.analyzer.callgraph.CallGraphNode;
+import codemetro.analyzer.gitinspector.GitInspectorEntry;
 
 public class MapPlot extends PApplet{
 	
@@ -32,7 +49,6 @@ public class MapPlot extends PApplet{
 	List<Train> trainManager = new ArrayList<Train>();
 	List<Feature> allLoFL = Collections.synchronizedList(new ArrayList<Feature>()); //contains all the Features in a List
 	List<MultiFeature> newlyadded = new ArrayList<MultiFeature>(); //contains the features that we will add to the current metro map
-	MultiFeature wayPoints = new MultiFeature(); //contains the wayPoints for all the lines
 	Random rand = new Random(100);
 	int year = 1980;
 	int finalyear = 0;
@@ -41,11 +57,19 @@ public class MapPlot extends PApplet{
 	String yearStr = Integer.toString(year);
 	String name = "Testing";
 	boolean modifying = false;
-	List<MultiFeature> loMF;
+	JFrame infoPanel = new JFrame();
+	/**
+	 * List of shape features.
+	 * Also known as a list of lines.
+	 */
+	List<ShapeFeature> loSF;
 	List<Location> loStations = new ArrayList<Location>();
+	List<SimplePointMarker> loSPM = new ArrayList<SimplePointMarker>();
 	
-	public MapPlot(List<MultiFeature> loMF) {
-		this.loMF = loMF;
+	ArrayList<GitInspectorEntry> gie;
+	
+	public MapPlot(List<ShapeFeature> loSF) {
+		this.loSF = loSF;
 	}
 	
 	public MapPlot() {
@@ -58,6 +82,7 @@ public class MapPlot extends PApplet{
 	public void setup() {
 		size(1280, 720); //setup size of applet, using OpenGL's PGraphics2D as the renderer
 		smooth(); //anti-aliase edges
+		//frameRate(30f);
 		noStroke();	
 		Ani.init(this); //initialize Ani, our train moving visualizer...	
 		Ani.setDefaultEasing(Ani.QUAD_IN_OUT);
@@ -65,15 +90,16 @@ public class MapPlot extends PApplet{
 		
 		CodeMetro codemetro = new CodeMetro();
 		codemetro.run();
+		gie = codemetro.fuser.getGieList();
 		//testmethod();
 		//noLoop();
 		//    /Users/tonychu/Documents/410workspace/CodeMetro/
-		loMF = codemetro.getFeatures();
-		System.out.println("LIST OF MAP FEATURES. Size " + loMF.size());
-		for (int i = 0; i < loMF.size(); i++) {
+		loSF = codemetro.getFeatures();
+		loSPM = codemetro.getStationMarkers();
+		System.out.println("LIST OF MAP FEATURES. Size " + loSF.size());
+		for (int i = 0; i < loSF.size(); i++) {
 			if (true) break;
-			for(int j = 0; j <  loMF.get(i).getFeatures().size(); j++) {
-				ShapeFeature sf = (ShapeFeature) loMF.get(i).getFeatures().get(j);
+				ShapeFeature sf = loSF.get(i);
 				System.out.println();
 				System.out.println(sf.getProperty("caller"));
 				System.out.println(sf.getProperty("callee"));
@@ -81,7 +107,6 @@ public class MapPlot extends PApplet{
 					System.out.println(sf.getLocations().get(k));
 				}
 				System.out.println();
-			}
 		}
 		System.out.println("Done iterating.");
 		/*
@@ -91,7 +116,6 @@ public class MapPlot extends PApplet{
 		*/
 		
 		
-		System.out.println("Done adding lines");
 
 		
 		// Add mouse and keyboard interactions 
@@ -103,19 +127,39 @@ public class MapPlot extends PApplet{
 		int zoomLv = 6; //the level of zoom for the map (0 = world view, bigger number = more zoom) use 12
 		metro.zoomAndPanTo(zoomLv, testMap);
 		List<Feature> loFL = allLoFL;
-		for (int i = 0; i < 5; i++) {
-			List<Feature> templist = new ArrayList<Feature>();
-			for (int listindex = 0; listindex < loMF.get(i).getFeatures().size(); listindex++) {
-				templist.add(loMF.get(i).getFeatures().get(listindex)); //add all the features inside a multifeature into templist
-				wayPoints.addFeature(loMF.get(i).getFeatures().get(listindex));
-			}
-			MultiFeature tempmf = plotLines(metro, templist); //convert lines to subway lines
-			linetoStation(templist); //plot the stations
-			addTrain(tempmf, templist);
+		
+		List<Feature> templist = new ArrayList<Feature>();
+
+		for (int i = 0; i < loSF.size(); i++) {
+			ShapeFeature sf = loSF.get(i);
+			
+			System.err.println();
+			System.err.println(sf.getProperty("edge"));
+			CallGraphNode caller = ((CallGraphNode) sf.getProperty("caller"));
+			CallGraphNode callee = ((CallGraphNode) sf.getProperty("callee"));
+			System.err.println("Caller: " + caller);
+			System.err.println("Callee: " + callee);
+			System.err.println(sf.getLocations());
+			System.err.println();
+			
+			templist.add(sf); //add all the features inside a multifeature into templist
+				
+			//linetoStation(templist); //plot the stations
+			sf = lineToSubwayLine(sf); //converts lines to Subway-style lines
+			//loSF.set(i, sf);
+			
+			
+		}
+		System.err.println("I AM PLOTTING LINES.");
+		plotLines(metro, loSF); 
+		
+		for (ShapeFeature sf : loSF) {
+			System.err.println("Adding train.");
+			addTrain(sf);
 		}
 		
-		
-
+		System.out.println("Adding Stations");
+		plotPoints(metro, loSPM);
 		
 		/*
 		while (newlyadded.size() > 0) {
@@ -138,8 +182,8 @@ public class MapPlot extends PApplet{
 			}
 		}
 		*/
-
-		run(loFL, wayPoints); //runs the trains across the lines and counts the year
+		System.err.println("I AM RUNNING TRAINS NOW.");
+		run(loFL); //runs the trains across the lines and counts the year
 	}
 	
 	private void testmethod() { //TODO remove later when Angelo's stuff works with MapPlot
@@ -193,50 +237,35 @@ public class MapPlot extends PApplet{
 		}
 	}
 	
-	private void addTrain(MultiFeature wayPoints, List<Feature> loF) { //puts a train onto that line
+	/**
+	 * 
+	 * @param wayPoints
+	 * @param loF
+	 */
+	private void addTrain(ShapeFeature sF) { //puts a train onto that line
 		//plotPoints(metro, loF); //plots the list of feature markers (loF) onto Unfolding Map(metro)
-		for (int i = 0; i < loF.size(); i++) {
-			ShapeFeature sF = (ShapeFeature) wayPoints.getFeatures().get(i); //convert feature in wayPoints to shapefeature
-			Train train = new Train(sF.getLocations().get(0)); //initialize train at beginning of the line
+		for (int i = 0; i < sF.locations.size(); i++) {
+			Train train = new Train(sF); //initialize train at beginning of the line
 			train.getTrain().setColor(color(0,0,0));
 			trainManager.add(train); //add train to trainManager
-			train.setloF(loF);
-			train.setMultiFeat(wayPoints);
-			train.setWayPoints(wayPoints.getFeatures().get(i)); //add waypoints of where the train needs to go (the line)
 			metro.addMarker(train.getTrain()); //add train to the map
 		}
 	}
 	
-	private synchronized void run(List<Feature> allLoFL, final MultiFeature wayPoints) {
+	private synchronized void run(List<Feature> allLoFL) {
 		Timer timer = new Timer();
 		timer.schedule(new VariableTimerTask(trainManager) {
 			@Override
 			public synchronized void run() {
-				modifying = true;
 
-				for (int i = 0; i < trainManager.size(); i++) { //moves each train to the next waypoint
-					Train train = trainManager.get(i);
-					if (train.getIndexWayPoint() == 0) {
-						train.setX(train.getLocations().get(0).x);
-						train.setY(train.getLocations().get(0).y);
-					}
-					ShapeFeature sF = (ShapeFeature) wayPoints.getFeatures().get(i);
-					int result = moveTrains(train, sF.getLocations().get(train.getIndexWayPoint()));
-					if (result == -1) { //TODO
-						
-					}
-					train.setIndexWayPoint(train.getIndexWayPoint() + 1);
-					if (train.getIndexWayPoint() >= train.getLocations().size()-1){
-						train.setIndexWayPoint(0);
-					}
-				}
-				yearcounter++;
-				if (yearcounter == 2) {
-					year++;
-					yearcounter = 0;
-				}
-				yearStr = Integer.toString(year);
-				modifying = false;
+				moveTrains();
+				
+//				yearcounter++;
+//				if (yearcounter == 2) {
+//					year++;
+//					yearcounter = 0;
+//				}
+//				yearStr = Integer.toString(year);
 			}
 		}, 2500, 4050);
 	}
@@ -250,16 +279,16 @@ public class MapPlot extends PApplet{
 		newlyadded.add(temp);
 	}
 	
-	public void addLines(List<MultiFeature> mf) {
-		this.loMF = mf;
+	public void addLines(List<ShapeFeature> loSF) {
+		this.loSF = loSF;
 	}
 	
 	/**
-	 * Converts List<Features> to MultiFeature class
+	 * Converts List<Features> to MultiFeature object containing each Feature.
 	 * @param loF list of features
 	 * @return MultiFeature class
 	 */
-	private MultiFeature listToMultiFeat(List<Feature> loF) { //Converts List<Feature> into MultiFeature
+	private MultiFeature listToMultiFeat(List<ShapeFeature> loF) { //Converts List<Feature> into MultiFeature
 		MultiFeature multiFeature = new MultiFeature();
 		for (int i = 0; i < loF.size(); i++) {
 			multiFeature.addFeature(loF.get(i));
@@ -273,6 +302,7 @@ public class MapPlot extends PApplet{
 	 * @param loF list of features
 	 * @return List<Marker> 
 	 */
+	/*
 	public List<Marker> plotPoints(UnfoldingMap metro, List<Feature> loF) {
 		//Plot Points
 		List<Marker> loM = MapUtils.createSimpleMarkers(loF);
@@ -288,7 +318,7 @@ public class MapPlot extends PApplet{
 		}
 		return loM;
 	}
-	
+	*/
 	/**
 	 * Plot the point with the given parameters
 	 * @param metro UnfoldingMap class
@@ -302,25 +332,69 @@ public class MapPlot extends PApplet{
 		simpleMarker = new SimplePointMarker(loc);
 		simpleMarker.setStrokeWeight(markerSize);
 		simpleMarker.setStrokeColor(color(0,0,0)); //Black
-		simpleMarker.setColor(color(255,255,255)); //White
+		
 
 		metro.addMarker(simpleMarker);
 	}
 	
-	public MultiFeature plotLines(UnfoldingMap metro, List<Feature> loFL) { //loFL is the list of points we want as a line
+	private void plotPoints(UnfoldingMap metro, List<SimplePointMarker> loSPM) {
+		for (int i = 0; i < loSPM.size(); i++) {
+			SimplePointMarker simpleMarker = loSPM.get(i);
+			loSPM.get(i).setStrokeWeight(3);
+			loSPM.get(i).setStrokeColor(color(0,0,0));
+			
+			// Colour scaling.
+			CallGraphNode node = (CallGraphNode) simpleMarker.getProperty("data");
+			
+			
+			// Colour scaling.
+			int innerColor = color(255,255,255);
+			int incomingCnt = node.incoming.size();
+			int outgoingCnt = node.outgoing.size();
+			if ((incomingCnt + outgoingCnt) > 0){
+				double ratio = outgoingCnt / (double) (outgoingCnt + incomingCnt);
+				int outPart = (int) (ratio * 255);
+				int scaledOut = (int) (ratio * 64 + 192);
+				int scaledIn = (int) (ratio * -64 + 192);
+				innerColor = color(255 - outPart, 255, 0);
+			} 
+			
+			simpleMarker.setColor(innerColor); //White
+			
+			metro.addMarker(loSPM.get(i));
+		}
+	}
+	
+	/**
+	 * Takes a List of ShapeFeatures and plots them onto the the metro.
+	 * Each Feature should be a single line.
+	 * @param metro
+	 * @param loFL
+	 * @return
+	 */
+	public MultiFeature plotLines(UnfoldingMap metro, List<ShapeFeature> loFL) {
 		//Plot Lines
 		MultiFeature mF = listToMultiFeat(loFL);
-
-		for (int index = 0; index < loFL.size(); index++) { //for each polyline set
+		
+		return plotLines(metro, mF);
+	}
+	
+	/**
+	 * Takes a MultiFeature containing multiple Features and plots them onto the metro.
+	 * Each Feature should be a line.
+	 * @param metro
+	 * @param mF
+	 * 
+	 */
+	public MultiFeature plotLines(UnfoldingMap metro, MultiFeature mF){
+		System.err.println("Plotting each shape in the multifeature.");
+		for (int index = 0; index < mF.getFeatures().size(); index++) { //for each polyline set
 			ShapeFeature line = (ShapeFeature) mF.getFeatures().get(index);
-			line = lineToSubwayLine(line); //converts lines to Subway-style lines
-			
 			//Plot lines onto map and add characteristics to lines
 			SimpleLinesMarker lineMarker = new SimpleLinesMarker(line.getLocations());
 			lineMarker.setStrokeWeight(5);
 			lineMarker.setColor(color(rand.nextInt(255),rand.nextInt(255),rand.nextInt(255))); //just some random color
 
-			mF.addFeature(line); //each mF is exactly one line
 			metro.addMarker(lineMarker);
 		}
 		return mF;
@@ -383,6 +457,7 @@ public class MapPlot extends PApplet{
 				if ((currentLat != nextLat)&&(currentLon == nextLon)) { //a vertical line
 				} else if ((currentLat == nextLat) && (currentLon != nextLon)) { //a horizontal line
 				} else {
+					System.out.println("DIDN'T CHANGE A POINT.");
 				}
 			}
 			
@@ -390,7 +465,19 @@ public class MapPlot extends PApplet{
 		return linePoint;
 	}
 	
-	private synchronized int moveTrains(Train train, Location loc) {
+	private synchronized void moveTrains(){
+		noLoop();
+		for (int i = 0; i < trainManager.size(); i++) { //moves each train to the next waypoint
+			Train train = trainManager.get(i);
+			int result = moveTrain(train);
+			if (result == -1) { //TODO
+				
+			}
+		}
+		loop();
+	}
+	
+	private synchronized int moveTrain(Train train) {
 		return train.moveTrain(this);	
 	}
 	
@@ -404,6 +491,105 @@ public class MapPlot extends PApplet{
 			return "";
 		}
 	}
+	
+	/**
+	 * Finds the station under mouse position and pops and overlay
+	 */
+	public synchronized void mousePressed() {
+		noLoop();
+		float currentmouseX = mouseX;
+		float currentmouseY = mouseY;
+		Location currentmouseLoc = metro.getLocation(currentmouseX, currentmouseY);
+		System.out.println("Finding a station");
+		float epsilon = 0.3f;
+		for (int i = 0; i < loSPM.size(); i++) {
+			SimplePointMarker spm = loSPM.get(i);
+			float currentStationX = spm.getLocation().x;
+			float currentStationY = spm.getLocation().y;
+			if ((Math.abs(currentStationX - currentmouseLoc.x) < epsilon) && (Math.abs(currentStationY - currentmouseLoc.y) < epsilon)) {
+				System.out.println("Found a station!");
+				
+				//infoPanel.dispatchEvent(new WindowEvent(infoPanel, WindowEvent.WINDOW_CLOSING));
+				infoPanel = new JFrame();
+				infoPanel.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				infoPanel.setBounds(300, 200, 800, 600);
+				infoPanel.setVisible(true);
+				
+				infoPanel.setTitle("Station name: " +  spm.getId());
+				System.out.println("Authors: " + spm.getProperty("authors"));
+				CallGraphNode cgn = (CallGraphNode) spm.getProperty("data");
+				System.out.println(cgn.toString());
+				
+				Object outData[][] = new Object[cgn.outgoing.size()][2];
+				for (int j = 0; j < cgn.outgoing.size(); j++) {
+					CallGraphEdge edge = cgn.outgoing.get(j);
+					outData[j][0] = edge.getQualifiedCaller();
+					outData[j][1] = edge.getQualifiedCallee();
+				}
+				
+				Object rowData[][] = new Object[cgn.incoming.size()][2];
+				for (int j = 0; j < cgn.incoming.size(); j++) {
+					CallGraphEdge edge = cgn.incoming.get(j);
+					rowData[j][0] = edge.getQualifiedCaller();
+					rowData[j][1] = edge.getQualifiedCallee();
+				}
+				
+				
+				//Object rowData[][] = {	{spm.getProperty("authors"), spm.getProperty("authors")},
+				//					 };
+								
+				
+				
+				JPanel authorPanel = new JPanel();
+				HashMap<String, Integer> authors = (HashMap<String, Integer>) spm.getProperty("authors");
+				if (authors.size() == 0) {
+					//TODO no author found
+					authorPanel.add(new JLabel("No author data found."));
+				} else {
+
+					Object authorRow[][] = new Object[authors.size()][2];
+
+					Set<String> aKeys = authors.keySet();
+					Iterator<String> aIter = (Iterator<String>) aKeys.iterator();
+					while (aIter.hasNext()){
+						String aName = aIter.next();
+						int j = 0;
+						authorRow[j][0] = aName;
+						authorRow[j][1] = authors.get(aName);
+						j++;
+					}
+					Object authorColumnNames[] = {"Author", "Lines Modified"};
+					JTable authortable = new JTable(authorRow, authorColumnNames);
+					authorPanel.add(authortable);
+				}
+
+				Object outColumnNames[] = {"Calling Method", "Called Method"};
+
+				JTable outCallTable = new JTable(outData, outColumnNames);
+				JScrollPane outPane = new JScrollPane(outCallTable);
+				
+				Object inColumnNames[] = {"Calling Method", "Called Method"};
+
+				JTable inCallTable = new JTable(rowData, inColumnNames);
+				JScrollPane inPane = new JScrollPane(inCallTable);
+
+				JPanel contentPane = new JPanel();
+				contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+				contentPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+
+				infoPanel.add(contentPane);
+				contentPane.add(authorPanel);
+				contentPane.add(outPane);
+				contentPane.add(inPane);
+
+				//infoPanel.pack();
+				break;
+			}
+		}
+		loop();
+	}
+	
+	
 	
 	/**
 	 * Updates and draw the map using the draw() method of UnfoldingMap class
@@ -430,8 +616,8 @@ public class MapPlot extends PApplet{
 		
 		for (int i = 0; i < trainManager.size(); i++) {
 			Train train = trainManager.get(i);
-			train.getMarker().setLocation(train.getLoc());
-			//train.getMarker().setLocation(train.getX(), train.getY());
+			train.getMarker().setLocation(train.getLocation());
+			train.getMarker().setLocation(train.getX(), train.getY());
 		}
 	}
 }

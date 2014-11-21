@@ -72,6 +72,14 @@ public class CallGraphEdge {
 		return to;
 	}
 	
+	public String getQualifiedCaller(){
+		return from.className + "." + caller;
+	}
+	
+	public String getQualifiedCallee(){
+		return to.className + "." + callee;
+	}
+	
 	public String toString(){
 		return from.className +"." + caller +  " --> " + to.className + "." + callee;
 	}
