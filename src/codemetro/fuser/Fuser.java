@@ -42,12 +42,20 @@ public class Fuser {
 		this.sList = new HashMap<String, Station>();		// <key, value>
 
 		
-		stationsMaker();			// GitInspector
+		newStationsMaker();			// Create stations.
+		assignAuthors();			// GitInspector
 		linkStations();				// CallGraph
 		assignCoordianteStations(); // assign coordinates to a station
 	}
 	
-	private void stationsMaker(){
+	private void newStationsMaker(){
+		for( Entry<String, CallGraphNode> entry : cgnList.entrySet()){
+			sList.put(entry.getKey(), new Station(entry.getKey()));
+			System.out.println("New station added: " + entry.getKey());
+		}
+	}
+	
+	private void assignAuthors(){
 		for(GitInspectorEntry gie : gieList){				// iterate through gie set
 			String authorName = gie.getName();				// author's name
 			HashMap<String, Integer> hm = gie.getHashMap();	// class and path , # of lines
@@ -60,14 +68,18 @@ public class Fuser {
 		    	String stationName = me.getKey();			// class and path
 		    	Integer lineContributed = me.getValue();
 		    	//if(!sList.isEmpty()){						// if station list is not empty
-		    		if(sList.containsValue(stationName)){	// if the class and path already exists
+		    		if(sList.containsKey(stationName)){	// if the class and path already exists
 		    			sList.get(stationName).addAuthor(authorName, me.getValue());
+		    			System.out.println("Updating station to sList \"" + stationName + "\" for author " + authorName);
 		    		} else{									// else add the new station
-		    			sList.put(stationName, new Station(stationName, authorName+" "+lineContributed));
+		    			Station station = new Station(stationName);
+		    			station.addAuthor(authorName, lineContributed);
+		    			sList.put(stationName, station);
+		    			System.err.println("Creating and adding new station to sList \"" + stationName  + "\" for author " + authorName);
 		    		}
 		    	/*} else{									// initialize station list
 		    		sList.put(stationName, new Station(stationName,authorName+" "+lineContributed));
-		    	}*/
+		    	}*/	
 		    }
 		}
 		//System.out.println(sList);
@@ -79,13 +91,18 @@ public class Fuser {
 
 	    while(iterator.hasNext()) {						// get elements
 	    	Map.Entry<String, CallGraphNode> me = (Map.Entry<String, CallGraphNode>)iterator.next(); // String=key, Integer=value
-	    	if(sList.containsValue(me.getKey())){		// if the method already exists
+	    	if(sList.containsKey(me.getKey())){		// if the method already exists
 	    		// callgraph of station = callgraph of cgnList if found
 	    		sList.get(me.getKey()).setCallGraphNode(me.getValue());
-	    	} 
+	    		
+	    		System.out.println("linkStations: Station found. " + me.getKey());
+	    		System.out.println(me.getValue());
+	    	} else {
+	    		System.err.println("linkStations: Station not found. " + me.getKey());
+	    	}
 	    }
 	}
-	
+
 	/*
 	 * assigns coordinates to stations in a circular pattern
 	 */
@@ -122,6 +139,7 @@ public class Fuser {
 		List<Feature> fList = new ArrayList<Feature>();
 		
 		Iterator<Entry<String, Station>> it = sList.entrySet().iterator();
+		System.out.println(sList);
 		while(it.hasNext()){ 	// iterate through the list of Stations
 			Map.Entry<String, Station> pairs = (Map.Entry<String, Station>)it.next();
 			
@@ -132,17 +150,34 @@ public class Fuser {
 			
 			// iterate through outgoing calls
 			for(CallGraphEdge cge: cgeOut){
-				Feature f = new ShapeFeature(FeatureType.LINES);
-				((ShapeFeature) f).addLocation(new Location(sList.get(cge.getCaller()).getXCoordinate(),sList.get(cge.getCaller()).getYCoordinate()));	// caller
-				((ShapeFeature) f).addLocation(new Location(sList.get(cge.getCallee()).getXCoordinate(),sList.get(cge.getCallee()).getYCoordinate()));	// callee
+				ShapeFeature f = new ShapeFeature(FeatureType.LINES);
+				double callerX = sList.get(cge.getCallerClass().getName()).getXCoordinate();
+				double callerY = sList.get(cge.getCallerClass().getName()).getYCoordinate();
+				Location callerLoc = new Location(callerX, callerY);
+				f.addLocation(callerLoc);	// caller
+				
+				double calleeX = sList.get(cge.getCalleeClass().getName()).getXCoordinate();
+				double calleeY = sList.get(cge.getCalleeClass().getName()).getYCoordinate();
+				Location calleeLoc = new Location(calleeX, calleeY);
+				f.addLocation(calleeLoc);	// callee
+				
 				fList.add(f);
 			}
 			
 			// iterate through incoming calls
 			for(CallGraphEdge cge: cgeIn){
-				Feature f = new ShapeFeature(FeatureType.LINES);
-				((ShapeFeature) f).addLocation(new Location(sList.get(cge.getCaller()).getXCoordinate(),sList.get(cge.getCaller()).getYCoordinate()));	// caller
-				((ShapeFeature) f).addLocation(new Location(sList.get(cge.getCallee()).getXCoordinate(),sList.get(cge.getCallee()).getYCoordinate()));	// callee
+				ShapeFeature f = new ShapeFeature(FeatureType.LINES);
+				
+				double callerX = sList.get(cge.getCallerClass().getName()).getXCoordinate();
+				double callerY = sList.get(cge.getCallerClass().getName()).getYCoordinate();
+				Location callerLoc = new Location(callerX, callerY);
+				f.addLocation(callerLoc);	// caller
+				
+				double calleeX = sList.get(cge.getCalleeClass().getName()).getXCoordinate();
+				double calleeY = sList.get(cge.getCalleeClass().getName()).getYCoordinate();
+				Location calleeLoc = new Location(calleeX, calleeY);
+				f.addLocation(calleeLoc);	// callee
+				
 				fList.add(f);
 			}
 		}

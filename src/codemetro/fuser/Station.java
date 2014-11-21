@@ -2,32 +2,23 @@ package codemetro.fuser;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import codemetro.analyzer.callgraph.CallGraphNode;
+import codemetro.analyzer.gitinspector.GitInspectorEntry;
 
 public class Station {
 	private String stationName;			// class and path name
-	private ArrayList<Train> inTrain; 	// input parameter
-	private ArrayList<Train> outTrain;	// output parameter
+	private ArrayList<Train> inTrain = new ArrayList<Train>(); 	// input parameter
+	private ArrayList<Train> outTrain = new ArrayList<Train>();	// output parameter
 	private CallGraphNode cgn;			// CallGraphNode
 	private Point coordinate;
 	private double xCoordinate;
 	private double yCoordinate;
-	private ArrayList<String> aList;	// author list
+	private HashMap<String, Integer> aList = new HashMap<String, Integer>();;	// author list
 	
 	public Station(String name){
 		this.stationName = name;
-		this.aList = new ArrayList<String>();
-		this.inTrain = new ArrayList<Train>();
-		this.outTrain = new ArrayList<Train>();		
-	}
-	
-	public Station(String name, String author){
-		this.stationName = name;
-		this.aList = new ArrayList<String>();
-		aList.add(author);
-		this.inTrain = new ArrayList<Train>();
-		this.outTrain = new ArrayList<Train>();		
 	}
 	
 	public void setCallGraphNode(CallGraphNode cgn){
@@ -69,7 +60,7 @@ public class Station {
 	 * @param nLines number of lines the author has contributed
 	 */
 	public void addAuthor(String name, int nLines){
-		this.aList.add(name +" "+ nLines);
+		aList.put(name, nLines);
 	}
 	
 	/**
@@ -100,5 +91,8 @@ public class Station {
 		return this.stationName;
 	}
 	
+	public String toString(){
+		return stationName + aList + cgn;
+	}
 
 }

@@ -50,4 +50,11 @@ public class CallGraphNode {
 		}
 		return false;
 	}
+	
+	public String getName(){
+		return className;
+	}
+	public String toString(){
+		return className + outgoing;
+	}
 }

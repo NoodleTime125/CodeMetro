@@ -13,6 +13,7 @@ import codemetro.analyzer.gitinspector.GitInspector;
 import codemetro.analyzer.gitinspector.GitInspectorEntry;
 import codemetro.fuser.Fuser;
 import de.fhpotsdam.unfolding.data.Feature;
+import de.fhpotsdam.unfolding.data.MultiFeature;
 
 public class CodeMetro {
 
@@ -45,9 +46,10 @@ public class CodeMetro {
 		
 		//TODO Fuse both metrics into station/train.
 		Fuser f = new Fuser(c1, callGraph);
-		List<Feature> feat = f.createTransit();
+		List<MultiFeature> feat = f.createTransit();
 		//TODO convert into visualizer input
 		//TODO visualize
+		System.out.println(feat);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
