@@ -40,6 +40,7 @@ public class MapPlot extends PApplet{
 	String name = "Testing";
 	boolean modifying = false;
 	List<MultiFeature> loMF;
+	List<Location> loStations = new ArrayList<Location>();
 	
 	public MapPlot(List<MultiFeature> loMF) {
 		this.loMF = loMF;
@@ -60,13 +61,13 @@ public class MapPlot extends PApplet{
 		Ani.setDefaultEasing(Ani.QUAD_IN_OUT);
 		metro = new UnfoldingMap(this, new Google.GoogleSimplifiedProvider()); //TODO using GoogleSimplified2Provider for now...find a better map style
 		
-		//testmethod();
+		testmethod();
 		
-		
+		/*
 		for (int i = 0; i < loMF.size(); i++) {
 			addLine(loMF.get(i));
 		}
-		
+		*/
 
 		
 		// Add mouse and keyboard interactions 
@@ -109,12 +110,25 @@ public class MapPlot extends PApplet{
 	}
 
 	private void linetoStation(List<Feature> loFL) { //gets the stations from a line
-
 		for (int i = 0; i < loFL.size() ; i++) {
 			ShapeFeature wP = (ShapeFeature) loFL.get(i);
 			for (int j = 0; j < wP.getLocations().size() ; j++) {
 				if (j == 0 || j == wP.getLocations().size() -1) {
-					plotPoint(metro, wP.getLocations().get(j));
+					float wPX = wP.getLocations().get(j).x;
+					float wPY = wP.getLocations().get(j).y;
+					
+					for (int k = 0; k < loStations.size(); k++) {
+						float stationX = loStations.get(k).x;
+						float stationY = loStations.get(k).y;
+						if (wPX == stationX && wPY == stationY) {
+							plotPoint(metro, wP.getLocations().get(j), 6);
+						}
+					}
+					
+					
+					loStations.add(wP.getLocations().get(j));
+					plotPoint(metro, wP.getLocations().get(j), 3);
+					System.out.println();
 				}
 			}
 		}
@@ -146,9 +160,9 @@ public class MapPlot extends PApplet{
 						templist.add(newlyadded.get(0).getFeatures().get(i));
 					}
 					synchronized (metro) {
-					MultiFeature tempmf = plotLines(metro, templist); //converts templist to subway style lines and plots them onto Unfolding Map (metro)
-					linetoStation(templist); //takes in a line and plots stations at the beginning and end of the lines
-					addTrain(tempmf, templist); //adds a train to each line
+						MultiFeature tempmf = plotLines(metro, templist); //converts templist to subway style lines and plots them onto Unfolding Map (metro)
+						linetoStation(templist); //takes in a line and plots stations at the beginning and end of the lines
+						addTrain(tempmf, templist); //adds a train to each line
 					}
 					for (int i = 0; i < newlyadded.get(0).getFeatures().size(); i++) {
 						wayPoints.addFeature(newlyadded.get(0).getFeatures().get(i));
@@ -230,14 +244,15 @@ public class MapPlot extends PApplet{
 	/**
 	 * Plot the point with the given parameters
 	 * @param metro UnfoldingMap class
+	 * @param bigger 
 	 * @param feat a feature
 	 * @return void 
 	 */
-	private void plotPoint(UnfoldingMap metro, Location loc) {
+	private void plotPoint(UnfoldingMap metro, Location loc, int markerSize) {
 		//Plot Points
 		SimplePointMarker simpleMarker;
 		simpleMarker = new SimplePointMarker(loc);
-		simpleMarker.setStrokeWeight(3);
+		simpleMarker.setStrokeWeight(markerSize);
 		simpleMarker.setStrokeColor(color(0,0,0)); //Black
 		simpleMarker.setColor(color(255,255,255)); //White
 
