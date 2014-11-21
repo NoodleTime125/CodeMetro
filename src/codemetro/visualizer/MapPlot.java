@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
 
+import codemetro.CodeMetro;
+
 public class MapPlot extends PApplet{
 	
 	// Instant fields and constants
@@ -54,20 +56,42 @@ public class MapPlot extends PApplet{
 	 * Setting up the visualizer
 	 */
 	public void setup() {
-		size(1280, 720, P2D); //setup size of applet, using OpenGL's PGraphics2D as the renderer
+		size(1280, 720); //setup size of applet, using OpenGL's PGraphics2D as the renderer
 		smooth(); //anti-aliase edges
 		noStroke();	
 		Ani.init(this); //initialize Ani, our train moving visualizer...	
 		Ani.setDefaultEasing(Ani.QUAD_IN_OUT);
 		metro = new UnfoldingMap(this, new Google.GoogleSimplifiedProvider()); //TODO using GoogleSimplified2Provider for now...find a better map style
 		
-		testmethod();
-		
+		CodeMetro codemetro = new CodeMetro();
+		codemetro.run();
+		//testmethod();
+		//noLoop();
+		//    /Users/tonychu/Documents/410workspace/CodeMetro/
+		loMF = codemetro.getFeatures();
+		System.out.println("LIST OF MAP FEATURES. Size " + loMF.size());
+		for (int i = 0; i < loMF.size(); i++) {
+			if (true) break;
+			for(int j = 0; j <  loMF.get(i).getFeatures().size(); j++) {
+				ShapeFeature sf = (ShapeFeature) loMF.get(i).getFeatures().get(j);
+				System.out.println();
+				System.out.println(sf.getProperty("caller"));
+				System.out.println(sf.getProperty("callee"));
+				for (int k = 0; k < sf.getLocations().size(); k++) {
+					System.out.println(sf.getLocations().get(k));
+				}
+				System.out.println();
+			}
+		}
+		System.out.println("Done iterating.");
 		/*
 		for (int i = 0; i < loMF.size(); i++) {
 			addLine(loMF.get(i));
 		}
 		*/
+		
+		
+		System.out.println("Done adding lines");
 
 		
 		// Add mouse and keyboard interactions 
@@ -79,6 +103,41 @@ public class MapPlot extends PApplet{
 		int zoomLv = 6; //the level of zoom for the map (0 = world view, bigger number = more zoom) use 12
 		metro.zoomAndPanTo(zoomLv, testMap);
 		List<Feature> loFL = allLoFL;
+		for (int i = 0; i < 5; i++) {
+			List<Feature> templist = new ArrayList<Feature>();
+			for (int listindex = 0; listindex < loMF.get(i).getFeatures().size(); listindex++) {
+				templist.add(loMF.get(i).getFeatures().get(listindex)); //add all the features inside a multifeature into templist
+				wayPoints.addFeature(loMF.get(i).getFeatures().get(listindex));
+			}
+			MultiFeature tempmf = plotLines(metro, templist); //convert lines to subway lines
+			linetoStation(templist); //plot the stations
+			addTrain(tempmf, templist);
+		}
+		
+		
+
+		
+		/*
+		while (newlyadded.size() > 0) {
+
+			if (newlyadded.size() > 0) { //adds the newly added line to the map
+				List<Feature> templist = new ArrayList<Feature>(); 
+				for (int i = 0; i < newlyadded.get(0).getFeatures().size(); i++) {
+					templist.add(newlyadded.get(0).getFeatures().get(i));
+				}
+				synchronized (metro) {
+					MultiFeature tempmf = plotLines(metro, templist); //converts templist to subway style lines and plots them onto Unfolding Map (metro)
+					linetoStation(templist); //takes in a line and plots stations at the beginning and end of the lines
+					addTrain(tempmf, templist); //adds a train to each line
+				}
+				for (int i = 0; i < newlyadded.get(0).getFeatures().size(); i++) {
+					wayPoints.addFeature(newlyadded.get(0).getFeatures().get(i));
+				}
+				newlyadded.remove(0);
+
+			}
+		}
+		*/
 
 		run(loFL, wayPoints); //runs the trains across the lines and counts the year
 	}
@@ -154,22 +213,7 @@ public class MapPlot extends PApplet{
 			@Override
 			public synchronized void run() {
 				modifying = true;
-				if (newlyadded.size() > 0 && yearcounter == 0) { //adds the newly added line to the map
-					List<Feature> templist = new ArrayList<Feature>(); 
-					for (int i = 0; i < newlyadded.get(0).getFeatures().size(); i++) {
-						templist.add(newlyadded.get(0).getFeatures().get(i));
-					}
-					synchronized (metro) {
-						MultiFeature tempmf = plotLines(metro, templist); //converts templist to subway style lines and plots them onto Unfolding Map (metro)
-						linetoStation(templist); //takes in a line and plots stations at the beginning and end of the lines
-						addTrain(tempmf, templist); //adds a train to each line
-					}
-					for (int i = 0; i < newlyadded.get(0).getFeatures().size(); i++) {
-						wayPoints.addFeature(newlyadded.get(0).getFeatures().get(i));
-					}
-					newlyadded.remove(0);
 
-				}
 				for (int i = 0; i < trainManager.size(); i++) { //moves each train to the next waypoint
 					Train train = trainManager.get(i);
 					if (train.getIndexWayPoint() == 0) {
@@ -204,6 +248,10 @@ public class MapPlot extends PApplet{
 			temp.addFeature(sf);
 		}
 		newlyadded.add(temp);
+	}
+	
+	public void addLines(List<MultiFeature> mf) {
+		this.loMF = mf;
 	}
 	
 	/**

@@ -145,8 +145,6 @@ public class Fuser {
 			
 			// Station.CallGraphEdge.outgoing
 			ArrayList<CallGraphEdge> cgeOut = pairs.getValue().getCallGraphNode().outgoing;
-			// Station.CallGraphEdge.incoming
-			ArrayList<CallGraphEdge> cgeIn = pairs.getValue().getCallGraphNode().incoming;
 			
 			// iterate through outgoing calls
 			for(CallGraphEdge cge: cgeOut){
@@ -154,28 +152,13 @@ public class Fuser {
 				double callerX = sList.get(cge.getCallerClass().getName()).getXCoordinate();
 				double callerY = sList.get(cge.getCallerClass().getName()).getYCoordinate();
 				Location callerLoc = new Location(callerX, callerY);
+				f.addProperty("caller", cge.getCalleeClass().getName());
 				f.addLocation(callerLoc);	// caller
 				
 				double calleeX = sList.get(cge.getCalleeClass().getName()).getXCoordinate();
 				double calleeY = sList.get(cge.getCalleeClass().getName()).getYCoordinate();
 				Location calleeLoc = new Location(calleeX, calleeY);
-				f.addLocation(calleeLoc);	// callee
-				
-				fList.add(f);
-			}
-			
-			// iterate through incoming calls
-			for(CallGraphEdge cge: cgeIn){
-				ShapeFeature f = new ShapeFeature(FeatureType.LINES);
-				
-				double callerX = sList.get(cge.getCallerClass().getName()).getXCoordinate();
-				double callerY = sList.get(cge.getCallerClass().getName()).getYCoordinate();
-				Location callerLoc = new Location(callerX, callerY);
-				f.addLocation(callerLoc);	// caller
-				
-				double calleeX = sList.get(cge.getCalleeClass().getName()).getXCoordinate();
-				double calleeY = sList.get(cge.getCalleeClass().getName()).getYCoordinate();
-				Location calleeLoc = new Location(calleeX, calleeY);
+				f.addProperty("callee", cge.getCalleeClass().getName());
 				f.addLocation(calleeLoc);	// callee
 				
 				fList.add(f);

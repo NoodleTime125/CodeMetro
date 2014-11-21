@@ -128,7 +128,10 @@ public class CallGraphParser {
 		for (MethodDeclaration caller : visitor.getCallers()) {
 			IMethodBinding callerName = caller.resolveBinding();
 			String callerClass = callerName.getDeclaringClass().getQualifiedName();
-			//System.out.println("Testing declaring class: " + callerClass);	
+			if (callerClass.equals("")){
+				continue;
+			}
+			//System.err.println("Testing declaring class: " + callerClass);	
 
 			//System.out.println("Method name: " + caller.getName()
 			//		+ " Return type: " + caller.getReturnType2());
@@ -193,7 +196,7 @@ public class CallGraphParser {
 		CallGraphEdge edge = new CallGraphEdge(caller, callee);
 		edge.addEdgeBetween(callerNode, calleeNode);
 
-		System.out.println(caller + " in " + callerClass + " calls method " + callee + " in " + calleeClass);
+		//System.out.println(caller + " in " + callerClass + " calls method " + callee + " in " + calleeClass);
 
 	}
 }

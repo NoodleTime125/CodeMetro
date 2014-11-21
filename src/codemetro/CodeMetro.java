@@ -1,5 +1,7 @@
 package codemetro;
 
+import java.awt.BorderLayout;
+import java.awt.Frame;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,6 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import javax.swing.JApplet;
+import javax.swing.JFrame;
+
+import processing.core.PApplet;
 import codemetro.analyzer.callgraph.CallGraphNode;
 import codemetro.analyzer.callgraph.CallGraphRunner;
 import codemetro.analyzer.callgraph.parser.CallGraphParser;
@@ -17,15 +23,28 @@ import codemetro.visualizer.MapPlot;
 import de.fhpotsdam.unfolding.data.Feature;
 import de.fhpotsdam.unfolding.data.MultiFeature;
 
-public class CodeMetro {
+public class CodeMetro{
 
-
+	List<MultiFeature> feat;
 	/**
 	 * Main method
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		CodeMetro inst = new CodeMetro();
+		inst.run();
+		if (inst.feat != null){
+			MapPlot m = new MapPlot();
+			JFrame frame = new JFrame();
+			frame.add(m, BorderLayout.CENTER);
+			m.init();
+			m.setup();
+		}
+	}
+	
+	public void run(){
 		//TODO Call both call graph and gitinspector.
+
 		System.out.println("Please input the path to the directory of the repository.");
 		Scanner scan = new Scanner(System.in);
 
@@ -50,16 +69,17 @@ public class CodeMetro {
 
 				//TODO Fuse both metrics into station/train.
 				Fuser f = new Fuser(c1, callGraph);
-				List<MultiFeature> feat = f.createTransit();
+				feat = f.createTransit();
 				//TODO convert into visualizer input
 				//TODO visualize
-				System.out.println(feat);
-				
-				new MapPlot(feat);
+				//System.out.println(feat);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-
+	}
+	
+	public List<MultiFeature> getFeatures(){
+		return feat;
 	}
 }
